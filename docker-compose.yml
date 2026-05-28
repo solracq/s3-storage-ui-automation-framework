@@ -1,0 +1,51 @@
+services:
+  # s3 portal app service
+  app:
+    # build the app image
+    build:
+      context: .
+    container_name: secure-s3-portal-app
+    # App depends on minio and waits until MinIO is healthy
+    depends_on:
+      minio:
+        condition: service_healthy
+    # Configure FastAPI app through env variables
+    environment:
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET_NAME: secure-file-portal
+      MINIO_SECURE: "false"
+      DEFAULT_UPLOAD_ACTOR: phase1-demo-admin
+    # Publish the FastAPI UI to http://localhost:8000
+    ports:
+      - "8000:8000"
+
+  minio:
+    # Official MinIO container image
+    image: quay.io/minio/minio:latest
+    container_name: secure-s3-portal-minio
+    # Start the MinIO server using /data for obj storage and expose admin console on 9001
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    healthcheck:
+      # Check MinIO's built-in health endpoint from inside the container
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      # Make startup more resilient
+      timeout: 5s
+      retries: 5
+    ports:
+      # Publish for the s3-compatible API
+      - "9000:9000"
+      # Publish for the MinIO web console
+      - "9001:9001"
+    # Persist MinIO data in the named docker volume, so uploaded files preserve container restarts
+    volumes:
+      - minio-data:/data
+
+volumes:
+  # Declare named volume
+  minio-data:
