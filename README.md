@@ -10,6 +10,7 @@ This “Secure S3 File Portal” will contain the following functionality:
 * UI testability
 
 # Initial Folder Structure
+```text
 s3-storage-ui-automation-framework/
 ├── app/
 │   └── storage_portal/
@@ -43,3 +44,4 @@ s3-storage-ui-automation-framework/
 ├── requirements.txt
 ├── .gitignore
 └── README.md
+```
