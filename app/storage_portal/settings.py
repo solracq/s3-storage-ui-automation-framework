@@ -11,8 +11,17 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 
-# Defined for MINIO_SECURE, as the MinIO client expects a real boolean, not a string.
 def _parse_bool(value: str, default: bool = False) -> bool:
+    """
+    Defined for MINIO_SECURE, as the MinIO client expects a real boolean, not a string.
+
+    Args:
+        value (str): input value
+        default (bool, optional): Defaults to False.
+
+    Returns:
+        bool: retruns the pased bolean value
+    """
     normalized = value.strip().lower()
     if normalized in {"1", "true", "yes", "on"}:
         return True
@@ -21,8 +30,11 @@ def _parse_bool(value: str, default: bool = False) -> bool:
     return default
 
 
-@dataclass(frozen=True) # settings cannot be modified at runtime
+@dataclass(frozen=True)
 class Settings:
+    """
+    Defining a settings class, where settings cannot be modified at runtime.
+    """
     app_name: str
     minio_endpoint: str
     minio_access_key: str
@@ -32,8 +44,14 @@ class Settings:
     default_upload_actor: str
 
 
-@lru_cache  # make get_settings run once and reuse the same settings object
+@lru_cache
 def get_settings() -> Settings:
+    """
+    Method to get settings. 
+    @lru_cache makes get_settings run once and reuse the same settings object
+    Returns:
+        Settings: return settings object
+    """
     return Settings(
         app_name=os.getenv("APP_NAME", "Secure S3 File Portal"),
         minio_endpoint=os.getenv("MINIO_ENDPOINT", "localhost:9000"),
