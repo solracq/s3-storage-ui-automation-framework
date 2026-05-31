@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {# Shared document metadata and responsive viewport settings. #}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {# Dynamic page title composed from the application name and page-specific title. #}
+    <title>{{ settings.app_name }} | {{ page_title }}</title>
+    {# Global stylesheet for the portal UI. #}
+    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}" />
+  </head>
+  <body>
+    {# Shared page shell wrapping page-specific content and footer messaging. #}
+    <main class="page-shell">
+      {# Child templates inject their main content here. #}
+      {% block content %}{% endblock %}
+      {# Shared footer communicating current project scope to users and testers. #}
+      <footer data-testid="footer-note">
+        Senior SDET portfolio build in progress. Authentication, roles, and audit
+        logging arrive in Phase 2.
+      </footer>
+    </main>
+  </body>
+</html>
