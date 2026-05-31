@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {# Dashboard hero introducing the Secure S3 File Portal MVP. #}
+  <section class="hero" data-testid="portal-hero">
+    <span class="eyebrow">Secure Demo Environment</span>
+    <h1 data-testid="page-heading">Secure S3 File Portal</h1>
+    <p data-testid="page-description">
+      Phase 1 starts with the storage workflow foundation: a security-themed FastAPI
+      UI, stable automation hooks, and real MinIO-backed object operations. We will
+      layer authentication, role controls, and audit logging on top next.
+    </p>
+  </section>
+
+  {# Flash message area used after redirects such as upload and delete actions. #}
+  {% if message %}
+    <div
+      class="message message--{{ message_type }}"
+      data-testid="flash-message"
+      role="status"
+    >
+      {{ message }}
+    </div>
+  {% endif %}
+
+  {# Top dashboard panels for storage connectivity details and upload controls. #}
+  <section class="grid grid--two">
+    {# Storage readiness summary and connection metadata from app settings. #}
+    <article class="panel" data-testid="storage-status-panel">
+      <h2>Storage Status</h2>
+      {% if storage_ready %}
+        <span class="status-pill status-pill--ready" data-testid="storage-status">
+          Connected
+        </span>
+      {% else %}
+        <span class="status-pill status-pill--error" data-testid="storage-status">
+          Unavailable
+        </span>
+      {% endif %}
+
+      <div class="meta-list">
+        <div>
+          <strong>Bucket</strong>
+          <span data-testid="bucket-name">{{ settings.minio_bucket_name }}</span>
+        </div>
+        <div>
+          <strong>Endpoint</strong>
+          <span data-testid="storage-endpoint">{{ settings.minio_endpoint }}</span>
+        </div>
+        <div>
+          <strong>Current Mode</strong>
+          <span data-testid="portal-mode">Phase 1 foundation build</span>
+        </div>
+      </div>
+
+      {% if storage_error %}
+        {# Storage errors are surfaced here instead of failing the whole page. #}
+        <p data-testid="storage-error-message">
+          {{ storage_error }}
+        </p>
+      {% endif %}
+    </article>
+
+    {# File upload form for the current Phase 1 demo actor. #}
+    <article class="panel" data-testid="upload-panel">
+      <h2>Upload File</h2>
+      <form
+        class="upload-form"
+        data-testid="upload-form"
+        action="{{ url_for('upload_file') }}"
+        enctype="multipart/form-data"
+        method="post"
+      >
+        <div>
+          <label for="file">Choose file</label>
+          <input id="file" name="file" type="file" data-testid="upload-input" />
+        </div>
+        <div class="button-row">
+          <button
+            class="button--primary"
+            data-testid="upload-submit-button"
+            type="submit"
+          >
+            Upload to Secure Bucket
+          </button>
+        </div>
+      </form>
+    </article>
+  </section>
+
+  {# Main file listing area with conditional rendering for empty and populated states. #}
+  <section class="panel" data-testid="files-panel">
+    <h2>Stored Files</h2>
+
+    {# Render a table when files exist so Selenium can validate metadata and actions. #}
+    {% if files %}
+      <div class="table-shell">
+        <table data-testid="files-table">
+          <thead>
+            <tr>
+              <th>Filename</th>
+              <th>Object Key</th>
+              <th>Uploaded By</th>
+              <th>Content Type</th>
+              <th>Uploaded At</th>
+              <th>Size</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {# Each row represents a single stored object and its available actions. #}
+            {% for item in files %}
+              <tr data-testid="file-row">
+                <td data-testid="file-name">{{ item.filename }}</td>
+                <td class="mono" data-testid="file-object-key">{{ item.object_key }}</td>
+                <td data-testid="file-uploaded-by">{{ item.uploaded_by }}</td>
+                <td data-testid="file-content-type">{{ item.content_type }}</td>
+                <td data-testid="file-uploaded-at">
+                  {% if item.uploaded_at %}
+                    {{ item.uploaded_at.strftime("%Y-%m-%d %H:%M:%S %Z") }}
+                  {% else %}
+                    N/A
+                  {% endif %}
+                </td>
+                <td data-testid="file-size">{{ item.size_label }}</td>
+                <td>
+                  <div class="table-actions">
+                    <a
+                      class="button button--secondary"
+                      data-testid="download-file-button"
+                      href="{{ url_for('download_file') }}?object_key={{ item.object_key | urlencode }}"
+                    >
+                      Download
+                    </a>
+                    <form action="{{ url_for('delete_file') }}" method="post">
+                      <input name="object_key" type="hidden" value="{{ item.object_key }}" />
+                      <button
+                        class="button button--danger"
+                        data-testid="delete-file-button"
+                        type="submit"
+                      >
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      {# Empty-state guidance shown before any files have been uploaded. #}
+      <div class="empty-state" data-testid="empty-files-state">
+        No files are stored yet. Upload a sample object to verify the MinIO
+        integration end to end.
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}
