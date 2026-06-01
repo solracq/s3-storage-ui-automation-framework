@@ -23,7 +23,7 @@ services:
 
   minio:
     # Official MinIO container image
-    image: quay.io/minio/minio:latest
+    image: minio/minio:latest
     container_name: secure-s3-portal-minio
     # Start the MinIO server using /data for obj storage and expose admin console on 9001
     command: server /data --console-address ":9001"
