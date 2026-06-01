@@ -1,0 +1,297 @@
+/* Design tokens for the portal's security-themed visual system. */
+:root {
+  --bg: #09111b;
+  --panel: rgba(10, 24, 38, 0.88);
+  --panel-strong: rgba(8, 18, 28, 0.96);
+  --border: rgba(88, 162, 219, 0.22);
+  --text: #eef6fb;
+  --muted: #a9c1d8;
+  --accent: #59d0ff;
+  --accent-strong: #1ea7d8;
+  --success: #68e4a6;
+  --error: #ff758a;
+  --warning: #ffd36b;
+  --shadow: 0 22px 70px rgba(1, 8, 16, 0.45);
+}
+
+/* Global reset and document-level defaults. */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top, rgba(37, 106, 163, 0.32), transparent 34%),
+    linear-gradient(180deg, #0a1420 0%, #071019 62%, #061018 100%);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Shared layout containers and hero presentation. */
+.page-shell {
+  width: min(1160px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 3rem;
+}
+
+.hero {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: linear-gradient(145deg, rgba(14, 29, 44, 0.96), rgba(7, 18, 27, 0.84));
+  box-shadow: var(--shadow);
+}
+
+.eyebrow {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.05;
+}
+
+.hero p {
+  margin: 0;
+  max-width: 62rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* Reusable grid and panel building blocks for dashboard sections. */
+.grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.grid--two {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.panel {
+  padding: 1.5rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.panel h2 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+/* Status and metadata styles for storage health information. */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.status-pill--ready {
+  background: rgba(104, 228, 166, 0.16);
+  color: var(--success);
+}
+
+.status-pill--error {
+  background: rgba(255, 117, 138, 0.15);
+  color: var(--error);
+}
+
+.meta-list {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.meta-list strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--text);
+}
+
+.meta-list span {
+  color: var(--muted);
+}
+
+/* Flash message styles for success, error, and info feedback. */
+.message {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.1rem;
+  border-radius: 16px;
+  border: 1px solid transparent;
+}
+
+.message--success {
+  background: rgba(104, 228, 166, 0.14);
+  border-color: rgba(104, 228, 166, 0.28);
+  color: var(--success);
+}
+
+.message--error {
+  background: rgba(255, 117, 138, 0.16);
+  border-color: rgba(255, 117, 138, 0.28);
+  color: #ffd8de;
+}
+
+.message--info {
+  background: rgba(89, 208, 255, 0.14);
+  border-color: rgba(89, 208, 255, 0.28);
+  color: #cfeffd;
+}
+
+/* Upload form and button styles for primary portal actions. */
+.upload-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.upload-form label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+
+.upload-form input[type="file"] {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+  color: var(--text);
+}
+
+.button-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.button,
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button--primary,
+button[type="submit"] {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #02111a;
+}
+
+.button--secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.button--danger {
+  background: rgba(255, 117, 138, 0.16);
+  color: #ffd8de;
+  border: 1px solid rgba(255, 117, 138, 0.24);
+}
+
+/* File table styling, inline actions, and monospace metadata display. */
+.table-shell {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+}
+
+th,
+td {
+  padding: 0.95rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  vertical-align: top;
+}
+
+th {
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+td {
+  color: var(--text);
+}
+
+.table-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.mono {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9rem;
+}
+
+/* Empty-state and footer treatment for informational content. */
+.empty-state {
+  padding: 2rem;
+  border-radius: 18px;
+  border: 1px dashed rgba(89, 208, 255, 0.28);
+  background: rgba(9, 20, 30, 0.7);
+  text-align: center;
+  color: var(--muted);
+}
+
+footer {
+  margin-top: 2rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+/* Mobile adjustments for tighter layouts and stacked actions. */
+@media (max-width: 720px) {
+  .page-shell {
+    width: min(100% - 1rem, 100%);
+  }
+
+  .hero,
+  .panel {
+    padding: 1.2rem;
+  }
+
+  .button-row,
+  .table-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
