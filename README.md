@@ -68,10 +68,10 @@ If MinIO is not running, the app still starts, but the dashboard and `/health` e
 
 ## Endpoints
 
-* FastAPI UI (portal UI): `http://localhost:8000`
-* Health endpoint: `http://localhost:8000/health`
+* FastAPI UI (portal UI): `http://localhost:8000` -> This should show the "Secure S3 File Portal" ready to store files.
+* Health endpoint: `http://localhost:8000/health` -> This should return a JSON `"status":"ok"` and `"bucket":"secure-file-portal"`
 * MinIO API: `http://localhost:9000`
-* MinIO Console: `http://localhost:9001`
+* MinIO Console: `http://localhost:9001` -> This should show bucket information and contents
 
 ## Target Product Scope
 
@@ -82,6 +82,13 @@ The Secure S3 File Portal is intended to demonstrate:
 * File workflows
 * Audit logging
 * UI testability
+
+## Logs
+
+If issues during deployment of the `Secure S3 File Portal', docker logs can be obtain in the following way:
+```bash
+docker logs secure-s3-portal-app
+```
 
 ## Current Repository Structure
 
