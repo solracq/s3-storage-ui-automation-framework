@@ -34,7 +34,7 @@ Not implemented yet:
 
 ## Quick Start
 
-Recommended: run the full local stack with Docker Compose.
+It is recommended to run the full local stack with Docker Compose. This method builds the app image from Dockerfile using `requirements.txt`, the `app` container already starts `uvicorn` and compose also starts `MinIO`.
 
 ```bash
 docker compose up --build
@@ -52,7 +52,9 @@ You can also run the FastAPI app locally while keeping MinIO in Docker.
 docker compose up minio
 ```
 
-In a separate terminal:
+# Alternative way to run the application
+
+If the user wants to run the FastAPI app directly on a machine (instead of inside Docker), or if the user wants a faster code/test iteration, then use the method below:
 
 ```bash
 python3 -m venv .venv
@@ -61,11 +63,12 @@ pip install -r requirements.txt
 uvicorn app.storage_portal.main:app --reload
 ```
 
+**Note:**
 If MinIO is not running, the app still starts, but the dashboard and `/health` endpoint will show storage as unavailable.
 
 ## Endpoints
 
-* FastAPI UI: `http://localhost:8000`
+* FastAPI UI (portal UI): `http://localhost:8000`
 * Health endpoint: `http://localhost:8000/health`
 * MinIO API: `http://localhost:9000`
 * MinIO Console: `http://localhost:9001`
