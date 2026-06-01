@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import Response
 
 from app.storage_portal.routes.ui import router as ui_router
 from app.storage_portal.services.storage import StorageService
@@ -16,6 +16,8 @@ from app.storage_portal.settings import get_settings
 
 # Set the base directory (app/storage_portal)
 BASE_DIR = Path(__file__).resolve().parent
+STYLESHEET_PATH = BASE_DIR / "static" / "styles.css"
+STYLESHEET_CONTENT = STYLESHEET_PATH.read_text(encoding="utf-8")
 
 
 @asynccontextmanager
@@ -42,10 +44,19 @@ async def lifespan(app: FastAPI):
 
 # Create the FastAPI app with a title and the custom lifespan
 app = FastAPI(title="Secure S3 File Portal", lifespan=lifespan)
-# Mount /static so CSS and future frontend assets are served properly
-app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 # Register the UI routes from routes/ui.py
 app.include_router(ui_router)
+
+
+@app.get("/static/styles.css", name="portal_stylesheet")
+async def portal_stylesheet() -> Response:
+    """
+    Serve the portal stylesheet without relying on Starlette's StaticFiles threadpool path.
+
+    Returns:
+        Response: CSS content for the portal UI
+    """
+    return Response(content=STYLESHEET_CONTENT, media_type="text/css")
 
 
 @app.get("/health")

@@ -7,7 +7,7 @@
     {# Dynamic page title composed from the application name and page-specific title. #}
     <title>{{ settings.app_name }} | {{ page_title }}</title>
     {# Global stylesheet for the portal UI. #}
-    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('portal_stylesheet') }}" />
   </head>
   <body>
     {# Shared page shell wrapping page-specific content and footer messaging. #}
