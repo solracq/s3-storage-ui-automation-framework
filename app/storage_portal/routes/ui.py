@@ -15,7 +15,7 @@ templates = Jinja2Templates(
 )
 
 
-def get_storage_service(request: Request) -> StorageService:
+async def get_storage_service(request: Request) -> StorageService:
     """
     Return the shared storage service instance from the FastAPI app state.
     """
