@@ -50,9 +50,9 @@ Phase 1 has been the only part implemented at the moment, this includes the foll
 ### Testing Phase 1
 Therefore, the exploratory testing of Phase 1 will include the below:
 + Happy-path file workflows, e.g. upload, download and delete file
++ UI clarity and usability
 + File metadata correctness
 + Error/degraded behavior when storage is unavailable -> error messaging clarity
-+ UI clarity and usability
 + Testability of selectors, messages, and page structure
 + Negative scenarios like empty file behaivour, unusual filenames, repeated uploads, and browser refresh after actions
 
@@ -93,13 +93,59 @@ Go to the `Secure S3 File Portal` and access the health endpoint, `http://localh
 ```text
 {"status":"ok","storage_ready":true,"bucket":"secure-file-portal","storage_error":null}
 ```
+#### Scenario 2: Upload a file
+**Pre-requisite:**
+- No file has been uploaded on the `Secure S3 File Portal` 
 
-#### Scenario 2: Open Portal App
-Access the `Secure S3 File Portal` and verify the following:
-- `Secure S3 File Portal` title is displayed at the top of the page
-- A description of the S3 portal is showed
+Go to the `Secure S3 File Portal` and upload a file
 
 **Output**
-```text
-{"status":"ok","storage_ready":true,"bucket":"secure-file-portal","storage_error":null}
-```
+ 
+
+#### Scenario 3: Download an uploaded file
+**Pre-requisite:**
+- A file has been alrady uploaded on the `Secure S3 File Portal`
+
+Go to the `Secure S3 File Portal` and download the file
+
+**Output**
+
+
+#### Scenario 4: Delete an uploaded file
+**Pre-requisite:**
+- A file has been alrady uploaded on the `Secure S3 File Portal`
+
+Go to the `Secure S3 File Portal` and delete the file
+
+**Output**
+
+
+### UI clarity and usability Scenarios
+
+#### Scenario ##: Open Portal App
+Access the `Secure S3 File Portal` and verify the following:
+- `Secure S3 File Portal` title and descritpion
+- Storage status information
+- Bucket, endpoint and current mode info
+- Choose File and Upload File to Bucket buttons
+- Stored Files information 
+
+**Output**
+- `Secure S3 File Portal` title is displayed at the top of the page
+- A description of the S3 portal is showed
+- Storage Status shows `Connected` status
+- Bucket name, `secure-file-portal` is shown
+- Endpoint, `minio:9000` is displayed
+- Current mode, `Phase 1 foundation build`
+- Upload File section shows:
+  - `Choose File` button
+  - No file chosen is indicated, as initial state
+  - The upload to secure bucket button is available and clickable
+- Stored Files section is displayed:
+  - The following columns are shown:
+    - FILENAME
+    - OBJECT KEY
+    - UPLOADED BY
+    - CONTENT TYPE
+    - UPLOADED AT SIZE
+    - ACTIONS
