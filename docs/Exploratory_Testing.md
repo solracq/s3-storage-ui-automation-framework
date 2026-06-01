@@ -79,13 +79,25 @@ docker compose up --build
 docker logs secure-s3-portal-app
 ```
 
-### Setup
-- The `Secure S3 Portal App Terminal` has been deployed via docker compose, or directly to a machine. 
-- A web browser is open
+### Setup and Pre-requisites
+- The `Secure S3 Portal App` has been deployed via docker compose, or directly to a machine.
+- The `Secure S3 Portal App Terminal` is available
+- A Web browser is open
 
 ### Positive Scenarios (happy-path)
-#### Scenario 1: Check Portal App Health
+
+#### Scenario 1: Check Portal App Health Endpoint
 Go to the `Secure S3 File Portal` and access the health endpoint, `http://localhost:8000/health`
+
+**Output**
+```text
+{"status":"ok","storage_ready":true,"bucket":"secure-file-portal","storage_error":null}
+```
+
+#### Scenario 2: Open Portal App
+Access the `Secure S3 File Portal` and verify the following:
+- `Secure S3 File Portal` title is displayed at the top of the page
+- A description of the S3 portal is showed
 
 **Output**
 ```text
