@@ -50,11 +50,11 @@ Phase 1 has been the only part implemented at the moment, this includes the foll
 ### Testing Phase 1
 Therefore, the exploratory testing of Phase 1 will include the below:
 + Happy-path file workflows, e.g. upload, download and delete file
-+ UI clarity and usability
++ UI clarity, Messages, Page Structure and usability Scenarios
 + File metadata correctness
 + Error/degraded behavior when storage is unavailable -> error messaging clarity
-+ Testability of selectors, messages, and page structure
 + Negative scenarios like empty file behaivour, unusual filenames, repeated uploads, and browser refresh after actions
++ Edge scenarios
 
 ### Testing Approach
 
@@ -135,7 +135,7 @@ docker logs secure-s3-portal-app
 3) File information is no loner available in the Stored Files section of the portal
 3) File is no longer available in the MinIO console
 
-### UI clarity and usability Scenarios
+### UI clarity, Messages, Page Structure and usability Scenarios
 
 #### Scenario 5: Open Portal App
 **Pre-requisite:**
@@ -169,6 +169,16 @@ Access the `Secure S3 File Portal` and verify the following:
     - SIZE
     - ACTIONS
 
+#### Scenario 6: Verify the name and extension of the upoaded file match with the name and extension in the Fle Portal.
+**Pre-requisite:**
+- Secure S3 File Portal initial state (no file has been uploaded previously)
+
+1) Go to the `Secure S3 File Portal` 
+2) Upload a file with filename. 
+3) Vefify the filename that appears in the File Portal > Stored Files section matches with the actual filename of the object uploaded.
+
+**Output**
+ 3) Filename of the uploaded file in Portal matches with the filename uploaded earlier. 
 
 ### File Metadata Correctness
 
@@ -178,8 +188,14 @@ When storage is unavailable -> error messaging clarity
 
 #### Scenario ##: Attempt to upload a file without selecting a file
 
-### Testability of Selectors, Messages, and Page Structure
 
-
-### Negative scenarios 
+### Negative Scenarios 
 Empty file behaivour, unusual filenames, repeated uploads, and browser refresh after actions
+
+### Edge Scenarios
+
+#### Scenario : ASCII characters are supported in objectc's filename 
+**Pre-requisite:**
+- Secure S3 File Portal initial state (no file has been uploaded previously)
+
+Access the `Secure S3 File Portal` and verify th
