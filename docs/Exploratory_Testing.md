@@ -84,10 +84,12 @@ docker logs secure-s3-portal-app
 - The `Secure S3 Portal App Terminal` is available
 - A Web browser is open
 
-### Positive Scenarios (happy-path)
+
+### Positive Scenarios (Happy-Path)
 
 #### Scenario 1: Check Portal App Health Endpoint
-Go to the `Secure S3 File Portal` and access the health endpoint, `http://localhost:8000/health`
+1) Go to the `Secure S3 File Portal` 
+2) Access the health endpoint, `http://localhost:8000/health`
 
 **Output**
 ```text
@@ -97,10 +99,15 @@ Go to the `Secure S3 File Portal` and access the health endpoint, `http://localh
 **Pre-requisite:**
 - No file has been uploaded on the `Secure S3 File Portal` 
 
-Go to the `Secure S3 File Portal` and upload a file
+1) Go to the `Secure S3 File Portal` 
+2) Upload a file by clicking the Choose File button under the Upload File section of the File Porta. 
+3) Click on the Upload to Secure Bucket button to upload the file into the bucket. 
+4) Vefify the new file has been uploaded.
 
 **Output**
- 
+ 2) File is sucessfully selected and title displayed in the upload file section.
+ 3) File upladed successfully message displayed in File Portal.
+ 4) Upladed file appears in the MinIO console.
 
 #### Scenario 3: Download an uploaded file
 **Pre-requisite:**
@@ -114,11 +121,16 @@ Go to the `Secure S3 File Portal` and download the file
 #### Scenario 4: Delete an uploaded file
 **Pre-requisite:**
 - A file has been alrady uploaded on the `Secure S3 File Portal`
+- Uploaded file is displayed in the Stored Files section of the portal
 
-Go to the `Secure S3 File Portal` and delete the file
+1) Go to the `Secure S3 File Portal`
+2) Select and delete the file by clikcing the delete button. 
+3) Vefify the file appears deleted in the File Portal and in the MinIO console.
 
 **Output**
-
+3) File deleted successfully message appears in the File Portal
+3) File information is no loner available in the Stored Files section of the portal
+3) File is no longer available in the MinIO console
 
 ### UI clarity and usability Scenarios
 
@@ -149,3 +161,18 @@ Access the `Secure S3 File Portal` and verify the following:
     - CONTENT TYPE
     - UPLOADED AT SIZE
     - ACTIONS
+
+
+### File Metadata Correctness
+
+
+### Error/Degraded Behavior 
+When storage is unavailable -> error messaging clarity
+
+#### Scenario ##: Attempt to upload a file without selecting a file
+
+### Testability of Selectors, Messages, and Page Structure
+
+
+### Negative scenarios 
+Empty file behaivour, unusual filenames, repeated uploads, and browser refresh after actions
