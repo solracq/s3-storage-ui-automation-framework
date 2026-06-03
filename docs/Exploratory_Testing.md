@@ -107,6 +107,7 @@ docker logs secure-s3-portal-app
 **Output**
  2) File is sucessfully selected and title displayed in the upload file section.
  3) File upladed successfully message displayed in File Portal.
+ 3) The Stored Files section shows the correct uploaded file name, content type, uploaded date/time, and file size.
  4) Upladed file appears in the MinIO console.
 
 #### Scenario 3: Download an uploaded file
@@ -136,7 +137,10 @@ docker logs secure-s3-portal-app
 
 ### UI clarity and usability Scenarios
 
-#### Scenario ##: Open Portal App
+#### Scenario 5: Open Portal App
+**Pre-requisite:**
+- Secure S3 File Portal initial state (no file has been uploaded previously)
+
 Access the `Secure S3 File Portal` and verify the following:
 - `Secure S3 File Portal` title and descritpion
 - Storage status information
@@ -153,7 +157,7 @@ Access the `Secure S3 File Portal` and verify the following:
 - Current mode, `Phase 1 foundation build`
 - Upload File section shows:
   - `Choose File` button
-  - No file chosen is indicated, as initial state
+    - No file chosen is indicated as initial/default state
   - The upload to secure bucket button is available and clickable
 - Stored Files section is displayed:
   - The following columns are shown:
@@ -161,7 +165,8 @@ Access the `Secure S3 File Portal` and verify the following:
     - OBJECT KEY
     - UPLOADED BY
     - CONTENT TYPE
-    - UPLOADED AT SIZE
+    - UPLOADED AT
+    - SIZE
     - ACTIONS
 
 
