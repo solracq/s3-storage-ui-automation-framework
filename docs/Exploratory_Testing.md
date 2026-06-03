@@ -113,10 +113,12 @@ docker logs secure-s3-portal-app
 **Pre-requisite:**
 - A file has been alrady uploaded on the `Secure S3 File Portal`
 
-Go to the `Secure S3 File Portal` and download the file
+1) Go to the `Secure S3 File Portal` 
+2) Select and download the existing file
 
 **Output**
-
+2) User is able to download the file to the specified location
+3) File can be opened and viewed
 
 #### Scenario 4: Delete an uploaded file
 **Pre-requisite:**
