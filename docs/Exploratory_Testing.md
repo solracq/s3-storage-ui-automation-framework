@@ -178,7 +178,33 @@ Access the `Secure S3 File Portal` and verify the following:
 3) Vefify the filename that appears in the File Portal > Stored Files section matches with the actual filename of the object uploaded.
 
 **Output**
- 3) Filename of the uploaded file in Portal matches with the filename uploaded earlier. 
+ 3) Filename of the uploaded file in Portal matches with the filename uploaded earlier.
+
+#### Scenario 7: Verify the object key correctness of an uploaded file in the Fle Portal.
+**Pre-requisite:**
+- Secure S3 File Portal initial state (no file has been uploaded previously)
+
+1) Go to the `Secure S3 File Portal` 
+2) Upload a file.
+3) Vefify the object key name that appears in the File Portal > Stored Files section is correct
+
+**Output**
+ 3) Object key should contain the following:
+    - upload folder
+    - upload date
+    - random characters
+    - filename and extension 
+
+#### Scenario 7: Verify the 'uploadad by' information of the upoaded file matches with the Fle Portal's username.
+**Pre-requisite:**
+- Secure S3 File Portal initial state (no file has been uploaded previously)
+
+1) Go to the `Secure S3 File Portal` 
+2) Upload a file
+3) Vefify the 'uploaded by' information matches the current username in the portal.
+
+**Output**
+ 3) The uploaded file shows in the 'uploaded' column the current username in the portal.
 
 ### File Metadata Correctness
 
