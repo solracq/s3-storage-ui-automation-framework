@@ -13,6 +13,7 @@ Current objectives:
 * Verify that file metadata shown in the UI is correct
 * Verify that the portal provides clear feedback for positive and negative scenarios
 * Verify that the portal degrades gracefully when MinIO is unavailable
+* Verify that important UI workflows behave consistently across supported browsers
 * Document exploratory findings to support future test automation design
 
 ## 2. Entry, Suspension, and Exit Criteria
@@ -26,6 +27,7 @@ This section defines the criteria for starting, suspending, and completing the c
 * Required environment variables and local credentials are configured
 * Sample files are available for testing
 * Browser access is available
+* At least one target browser is available for execution
 * `docs/Exploratory_Testing.md` is available as the scenario execution reference
 
 ### 2.2 Suspension Criteria
@@ -66,6 +68,11 @@ The test environment for the current implementation includes:
 * MinIO container
 * Modern web browser
 
+### Planned browser coverage
+
+* Primary browser: Chrome
+* Secondary browsers for coverage expansion: Firefox and Safari, when available
+
 ### Environment details
 
 * Portal UI: `http://localhost:8000`
@@ -98,6 +105,7 @@ The current test cycle includes validation of the Phase 1 frontend implementatio
 * Browser refresh behavior after actions
 * Graceful degraded behavior when MinIO is unavailable
 * Cross-checking file actions in the MinIO console
+* Cross-browser validation of important UI workflows
 
 ### Out of Scope
 
@@ -133,6 +141,7 @@ The current test coverage is based on the exploratory scenarios documented in `d
   * Stored file information
   * Available actions
   * Refresh behavior
+  * Cross-browser behavior for important page interactions
 
 * Metadata validation
   * File name
@@ -171,6 +180,7 @@ The test cycle will use:
 * Files with non-ASCII characters in the file name
 * Different file types
 * Larger files for boundary exploration
+* More than one browser when available for comparison
 
 ## 8. Defect Management
 
@@ -194,6 +204,7 @@ Planned sequence:
   * Test strategy
   * Test plan
   * Exploratory findings review
+  * Initial cross-browser observations
 
 * Phase 2:
   * Validation of login, roles, audit entries, and seed/reset behavior
@@ -209,6 +220,7 @@ Planned sequence:
   * Regression automation
   * Negative automation
   * CI integration planning and execution
+  * Cross-browser automation expansion
 
 ## 10. Test Deliverables
 
@@ -225,6 +237,7 @@ Planned sequence:
 * Logs
 * Screenshots when useful
 * Defect reports
+* Cross-browser comparison notes, when applicable
 
 ### After testing
 

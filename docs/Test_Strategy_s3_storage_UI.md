@@ -22,6 +22,7 @@ The scope of this strategy is the frontend behavior of the `Secure S3 File Porta
 * Page refresh behavior after file actions
 * Graceful degraded behavior when MinIO is unavailable
 * UI testability through stable `data-testid` attributes
+* Cross-browser behavior of important UI workflows
 
 ### What is currently out of scope
 
@@ -83,6 +84,7 @@ The following testing types apply to the current frontend implementation:
 * Usability and UI Clarity Testing
 * Data Integrity / Metadata Validation
 * Reliability and Recovery Testing
+* Cross-Browser Testing
 * Negative Testing
 * Regression Testing
 
@@ -108,7 +110,12 @@ The following testing types apply to the current frontend implementation:
   * Severity: Medium
   * Mitigation: Validate downloads using the browser and local filesystem expectations, and document browser assumptions.
 
-* Risk 5: Current implementation limitations may be mistaken for formal requirements.
+* Risk 5: Cross-browser differences may affect UI behavior, file upload interaction, or download handling.
+  * Occurrence: Medium
+  * Severity: Medium
+  * Mitigation: Include cross-browser validation for important user workflows and document any browser-specific findings.
+
+* Risk 6: Current implementation limitations may be mistaken for formal requirements.
   * Occurrence: Medium
   * Severity: Medium
   * Mitigation: Distinguish between implemented behavior, known limitations, and future expected product behavior in test documentation.
@@ -122,6 +129,7 @@ The testing approach will be phased.
 * Begin with manual exploratory testing to understand the UI and the product behavior.
 * Use the portal UI as the primary validation layer.
 * Use the MinIO console as a supporting verification layer for upload and delete actions.
+* Include cross-browser checks for important workflows as part of manual validation.
 * Record findings in `docs/Exploratory_Testing.md`.
 * Use exploratory findings to drive the test plan, test strategy, and future automated coverage.
 
@@ -147,6 +155,12 @@ Planned automation utilities:
 * Test data helpers
 * Reusable page objects
 
+Planned browser coverage:
+
+* Chrome
+* Firefox
+* Safari, when available in the local environment
+
 ## 9. CI/CD Strategy
 
 The long-term target is Jenkins-based execution for the UI automation framework.
@@ -158,6 +172,7 @@ Planned CI behavior:
 * Run smoke tests first
 * Run broader regression and negative suites after smoke passes
 * Archive logs, screenshots, and test reports
+* Expand CI execution later to include cross-browser coverage where practical
 
 At the current Phase 1 stage, CI automation is planned but not yet implemented.
 

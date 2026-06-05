@@ -62,11 +62,13 @@ The exploratory testing for Phase 1 includes the following areas:
 * File metadata correctness
 * Negative scenarios such as empty file behavior, unusual filenames, repeated uploads, and browser refresh after actions
 * Edge scenarios
+* Cross-browser validation
 
 ### Testing Approach
 
 * First, perform testing through the portal UI at [http://localhost:8000](http://localhost:8000).
 * Then, use the MinIO console at `http://localhost:9001` to confirm backend effects after upload and delete actions.
+* When possible, repeat important portal scenarios in more than one browser to observe browser-specific behavior.
 
 ## Test Scenarios for the Secure S3 File Portal
 
