@@ -1,0 +1,2 @@
+Secure S3 File Portal
+Phase 1 starts with the storage workflow foundation: a security-themed FastAPI UI, stable automation hooks, and real MinIO-backed object operations. Authentication, role controls, and audit logging will be available on Phase 2.

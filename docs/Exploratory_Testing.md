@@ -52,7 +52,6 @@ Therefore, the exploratory testing of Phase 1 will include the below:
 + Happy-path file workflows, e.g. upload, download and delete file
 + UI clarity, Messages, Page Structure and usability Scenarios
 + File metadata correctness
-+ Error/degraded behavior when storage is unavailable -> error messaging clarity
 + Negative scenarios like empty file behaivour, unusual filenames, repeated uploads, and browser refresh after actions
 + Edge scenarios
 
@@ -95,7 +94,7 @@ docker logs secure-s3-portal-app
 ```text
 {"status":"ok","storage_ready":true,"bucket":"secure-file-portal","storage_error":null}
 ```
-#### Scenario 2: Upload a file
+#### Scenario 2: Upload a file by selecting file.
 **Pre-requisite:**
 - No file has been uploaded on the `Secure S3 File Portal` 
 
@@ -110,7 +109,22 @@ docker logs secure-s3-portal-app
  3) The Stored Files section shows the correct uploaded file name, content type, uploaded date/time, and file size.
  4) Upladed file appears in the MinIO console.
 
-#### Scenario 3: Download an uploaded file
+#### Scenario 3: Upload a file by dragging the file.
+**Pre-requisite:**
+- No file has been uploaded on the `Secure S3 File Portal` 
+
+1) Go to the `Secure S3 File Portal` 
+2) Upload a file by dragging the file to the Upload File section of the File Portal. 
+3) Click on the Upload to Secure Bucket button to upload the file into the bucket. 
+4) Verify the new file has been uploaded.
+
+**Output**
+ 2) File is sucessfully selected and title displayed in the upload file section.
+ 3) File upladed successfully message displayed in File Portal.
+ 3) The Stored Files section shows the correct uploaded file name, content type, uploaded date/time, and file size.
+ 4) Upladed file appears in the MinIO console.
+
+#### Scenario 4: Download an uploaded file
 **Pre-requisite:**
 - A file has been alrady uploaded on the `Secure S3 File Portal`
 
@@ -121,7 +135,7 @@ docker logs secure-s3-portal-app
 2) User is able to download the file to the specified location
 3) File can be opened and viewed
 
-#### Scenario 4: Delete an uploaded file
+#### Scenario 5: Delete an uploaded file
 **Pre-requisite:**
 - A file has been alrady uploaded on the `Secure S3 File Portal`
 - Uploaded file is displayed in the Stored Files section of the portal
@@ -137,7 +151,7 @@ docker logs secure-s3-portal-app
 
 ### UI clarity, Messages, Page Structure and usability Scenarios
 
-#### Scenario 5: Open Portal App
+#### Scenario 6: Open Portal App
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
@@ -169,7 +183,7 @@ Access the `Secure S3 File Portal` and verify the following:
     - SIZE
     - ACTIONS
 
-#### Scenario 6: Verify Stored Files Initial Status in Fle Portal.
+#### Scenario 7: Verify Stored Files Initial Status in Fle Portal.
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
@@ -181,7 +195,7 @@ Access the `Secure S3 File Portal` and verify the following:
  2) The following message is displayed: No files are stored yet. Upload a sample object to verify the MinIO integration end to end.
  2) & 3) No files are shown
 
-#### Scenario 7: Verify the name and extension of the upoaded file match with the name and extension in the Fle Portal.
+#### Scenario 8: Verify the name and extension of the upoaded file match with the name and extension in the Fle Portal.
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
@@ -192,7 +206,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Output**
  3) Filename of the uploaded file in Portal matches with the filename uploaded earlier.
 
-#### Scenario 8: Verify the object key correctness of an uploaded file in the Fle Portal.
+#### Scenario 9: Verify the object key correctness of an uploaded file in the Fle Portal.
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
@@ -207,7 +221,7 @@ Access the `Secure S3 File Portal` and verify the following:
     - random characters
     - filename and extension 
 
-#### Scenario 9: Verify the 'uploadad by' information of the upoaded file matches with the Fle Portal's username.
+#### Scenario 10: Verify the 'uploadad by' information of the upoaded file matches with the Fle Portal's username.
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
@@ -218,7 +232,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Output**
  3) The uploaded file shows in the 'uploaded' column the current username in the portal.
 
-#### Scenario 10: Verify the content type of the upoaded file matches with the content type in the Fle Portal.
+#### Scenario 11: Verify the content type of the upoaded file matches with the content type in the Fle Portal.
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
@@ -230,7 +244,7 @@ Access the `Secure S3 File Portal` and verify the following:
  3) Content type of the uploaded file in Portal matches with the content types uploaded earlier.
  3) Content type in file portal is shwon in the following format: "file_type / file_extension"
 
-#### Scenario 11: Verify the 'uploadad at' information of the upoaded file matches with the File Portal's date/time.
+#### Scenario 12: Verify the 'uploadad at' information of the upoaded file matches with the File Portal's date/time.
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
@@ -242,7 +256,7 @@ Access the `Secure S3 File Portal` and verify the following:
  3) The Stored Files section shows information about when the file was uploaded in the portal.
  3) The information is shown in the following format: Date - Time - TimeZone
 
-#### Scenario 12: Verify the 'size' information of the upoaded file matches with the file size in File Portal.
+#### Scenario 13: Verify the 'size' information of the upoaded file matches with the file size in File Portal.
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
@@ -253,7 +267,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Output**
  3) The Stored Files section shows information about when the file size.
 
-#### Scenario 13: Verify the 'Actions' information in File Portal.
+#### Scenario 14: Verify the 'Actions' information in File Portal.
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
@@ -266,22 +280,67 @@ Access the `Secure S3 File Portal` and verify the following:
  4) The Download and Delete options are clickable.
 
 
-### File Metadata Correctness
-
-
-### Error/Degraded Behavior 
-When storage is unavailable -> error messaging clarity
-
-#### Scenario ##: Attempt to upload a file without selecting a file
-
-
 ### Negative Scenarios 
 Empty file behaivour, unusual filenames, repeated uploads, and browser refresh after actions
 
+#### Scenario 15: Attempt to upload a file without selecting a file
+**Pre-requisite:**
+- Secure S3 File Portal initial state (no file has been uploaded previously)
+
+1) Go to the `Secure S3 File Portal` 
+2) Without choosing a file, click the upload button
+3) Verify no file can be uploaded and the respective error message is received
+
+**Output**
+ 3) No file can be uploaded
+ 4) "Please choose a file before uploading." error message is displayed
+   
+#### Scenario 16: Upload empty files
+**Pre-requisite:**
+- Secure S3 File Portal initial state (no file has been uploaded previously)
+
+1) Go to the `Secure S3 File Portal` 
+2) Upload an empty file
+3) Verify the file cannot be uploaded
+
+**Output**
+ 3) No file can be uploaded
+ 4) "Please upload a non-empty file." error message is displayed
+
+#### Scenario 17: Upload large files exceeding the allowed limit
+**Pre-requisite:**
+- Secure S3 File Portal initial state (no file has been uploaded previously)
+
+1) Go to the `Secure S3 File Portal` 
+2) Upload a large file exceeding the allowed limit (~1 MB)
+3) Verify the file cannot be uploaded
+
+**Output**
+ 3) No file can be uploaded
+ 3) "There was an error parsing the body" error message is displayed
+
+
 ### Edge Scenarios
+
+#### Scenario : Upload a file with unusual and long file name
+**Pre-requisite:**
+- Secure S3 File Portal initial state (no file has been uploaded previously)
+
+1) Go to the `Secure S3 File Portal` 
+2) Upload a file with an unusal long name
+3) Verify the file can be uploaded
+
+**Output**
+ 3) File can be uploaded successfully
+
+#### Scenario : Upload large files
+
+#### Scenario : Upload different type of files
 
 #### Scenario : ASCII characters are supported in objectc's filename 
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
 Access the `Secure S3 File Portal` and verify th
+
+### File Metadata Correctness
