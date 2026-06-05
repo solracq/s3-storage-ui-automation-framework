@@ -267,11 +267,11 @@ Access the `Secure S3 File Portal` and verify the following:
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a file.
-3. Verify that the `uploaded by` information matches the current portal actor.
+3. Verify that the `uploaded by` information matches the current Phase 1 portal actor.
 
 **Output**
 
-3) The uploaded file shows the current portal actor in the `uploaded by` column.
+3) The uploaded file shows `phase1-demo-admin` in the `uploaded by` column.
 
 #### Scenario 11: Verify the content type of the uploaded file in the File Portal
 
@@ -330,7 +330,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Output**
 
 3) The available actions for the uploaded file are `Download` and `Delete`.
-4) Both `Download` and `Delete` are clickable.
+3) Both `Download` and `Delete` are clickable.
 
 #### Scenario 15: Refresh the File Portal page after uploading or deleting a file
 
@@ -366,7 +366,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Output**
 
 3) No file is uploaded.
-4) The error message `Please choose a file before uploading.` is displayed.
+3) The error message `Please choose a file before uploading.` is displayed.
 
 #### Scenario 17: Upload an empty file
 
@@ -381,7 +381,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Output**
 
 3) No file is uploaded.
-4) The error message `Please upload a non-empty file.` is displayed.
+3) The error message `Please upload a non-empty file.` is displayed.
 
 #### Scenario 18: Upload a large file exceeding the allowed limit (more than 1 MB)
 
@@ -413,9 +413,28 @@ Access the `Secure S3 File Portal` and verify the following:
 3) The file cannot be uploaded.
 3) The error message `unsupported metadata value こんにちは.txt; only US-ASCII encoded characters are supported` is displayed.
 
+#### Scenario 20: Verify File Portal behavior when MinIO is unavailable
+
+**Prerequisite**
+
+* The `Secure S3 Portal App` is running.
+* MinIO has been stopped or is unavailable.
+
+1. Stop the MinIO service or make MinIO unavailable.
+2. Go to the `Secure S3 File Portal`.
+3. Access the health endpoint at `http://localhost:8000/health`.
+4. Verify the storage status shown in the portal.
+
+**Output**
+
+2) The `Secure S3 File Portal` remains accessible.
+3) The health endpoint returns a degraded response with `storage_ready` set to `false`.
+4) The portal shows `Unavailable` in the `Storage Status` section.
+4) A storage error message is displayed in the portal.
+
 ### Edge Scenarios
 
-#### Scenario 20: Upload a file with an unusual or long file name
+#### Scenario 21: Upload a file with an unusual or long file name
 
 **Prerequisite**
 
@@ -428,9 +447,9 @@ Access the `Secure S3 File Portal` and verify the following:
 **Output**
 
 3) The file can be uploaded successfully.
-4) The file name and object key with the unusual or long characters are displayed correctly in the File Portal.
+3) The file name and object key with the unusual or long characters are displayed correctly in the File Portal.
 
-#### Scenario 21: Upload a large file within the allowed limit (<= 1 MB)
+#### Scenario 22: Upload a large file within the allowed limit (<= 1 MB)
 
 **Prerequisite**
 
@@ -445,7 +464,7 @@ Access the `Secure S3 File Portal` and verify the following:
 3) The file can be uploaded successfully in the File Portal.
 3) The file is displayed in the MinIO console.
 
-#### Scenario 22: Upload different file types
+#### Scenario 23: Upload different file types
 
 **Prerequisite**
 
