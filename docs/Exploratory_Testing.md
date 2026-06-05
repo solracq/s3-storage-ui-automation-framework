@@ -279,11 +279,26 @@ Access the `Secure S3 File Portal` and verify the following:
  3) The available actions for the upladed file are: Download and Delete.
  4) The Download and Delete options are clickable.
 
+#### Scenario 15: Refresh File Portal page after uploading/deleting a file.
+**Pre-requisite:**
+- Secure S3 File Portal initial state (no file has been uploaded previously)
+
+1) Go to the `Secure S3 File Portal` 
+2) Upload a file
+3) Refresh browser page
+4) Verify the uploaded file information appears correctly in the File Portal > Stored Files section.
+5) Delete the file
+6) Refresh browser page
+7) Verify that there is not information about the file in the File Portal > Stored Files section.
+
+**Output**
+ 2) & 4) The uploade file information appears correctly in the Stored Files section.
+ 5) & 7) No information of the deleted file is available in the Stored Files section.
+
 
 ### Negative Scenarios 
-Empty file behaivour, unusual filenames, repeated uploads, and browser refresh after actions
 
-#### Scenario 15: Attempt to upload a file without selecting a file
+#### Scenario 16: Attempt to upload a file without selecting a file
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
@@ -295,7 +310,7 @@ Empty file behaivour, unusual filenames, repeated uploads, and browser refresh a
  3) No file can be uploaded
  4) "Please choose a file before uploading." error message is displayed
    
-#### Scenario 16: Upload empty files
+#### Scenario 17: Upload empty files
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
@@ -307,17 +322,29 @@ Empty file behaivour, unusual filenames, repeated uploads, and browser refresh a
  3) No file can be uploaded
  4) "Please upload a non-empty file." error message is displayed
 
-#### Scenario 17: Upload large files exceeding the allowed limit
+#### Scenario 18: Upload large files exceeding the allowed limit (more than 1 MB)
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
 1) Go to the `Secure S3 File Portal` 
-2) Upload a large file exceeding the allowed limit (~1 MB)
+2) Upload a large file exceeding the allowed limit (exceeding 1 MB)
 3) Verify the file cannot be uploaded
 
 **Output**
  3) No file can be uploaded
  3) "There was an error parsing the body" error message is displayed
+
+#### Scenario 19: Upload a file with non-ASCII characters in the file name
+**Pre-requisite:**
+- Secure S3 File Portal initial state (no file has been uploaded previously)
+
+1) Go to the `Secure S3 File Portal` 
+2) Upload a file with non-ASCII characters in the filename, e.g. "こんにちは"
+3) Verify the file cannot be uploaded
+
+**Output**
+ 3) File cannot be uploaded
+ 3) "unsupported metadata value こんにちは.txt; only US-ASCII encoded characters are supported" error message displayed
 
 
 ### Edge Scenarios
@@ -332,15 +359,30 @@ Empty file behaivour, unusual filenames, repeated uploads, and browser refresh a
 
 **Output**
  3) File can be uploaded successfully
+ 4) Filename and object key with the unusual long characters are displayed correctly in the File Portal
 
-#### Scenario : Upload large files
-
-#### Scenario : Upload different type of files
-
-#### Scenario : ASCII characters are supported in objectc's filename 
+#### Scenario : Upload large files within the limit range (<= 1 MB)
 **Pre-requisite:**
 - Secure S3 File Portal initial state (no file has been uploaded previously)
 
-Access the `Secure S3 File Portal` and verify th
+1) Go to the `Secure S3 File Portal` 
+2) Upload a large file within the allowed limit (<= 1 MB)
+3) Verify the file can be uploaded in the file portal and MinIO console
+
+**Output**
+ 3) File can be uploaded successfully in the file portal 
+ 3) Large file is displayed in the MinIO console
+
+#### Scenario : Upload different type of files
+**Pre-requisite:**
+- Secure S3 File Portal initial state (no file has been uploaded previously)
+
+1) Go to the `Secure S3 File Portal` 
+2) Upload different types of files (txt, pdf, docx, csv, jpeg, png, mp4, wav, md, no-extension)
+3) Verify all the files types can be uploaded in the file portal and MinIO console
+
+**Output**
+ 3) Files can be uploaded successfully in the file portal 
+ 3) Files are displayed in the MinIO console
 
 ### File Metadata Correctness
