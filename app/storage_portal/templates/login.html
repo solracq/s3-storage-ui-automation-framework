@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="auth-shell" data-testid="login-page">
+    <article class="panel auth-card">
+      <span class="eyebrow">Phase 2 Access Control</span>
+      <h1 data-testid="login-heading">Portal Login</h1>
+      <p class="panel-copy" data-testid="login-description">
+        Sign in with one of the local demo users to validate role-based behavior
+        and audit logging.
+      </p>
+
+      {% if message %}
+        <div
+          class="message message--{{ message_type }}"
+          data-testid="login-flash-message"
+          role="status"
+        >
+          {{ message }}
+        </div>
+      {% endif %}
+
+      <form
+        class="upload-form"
+        data-testid="login-form"
+        action="{{ url_for('login') }}"
+        method="post"
+      >
+        <div>
+          <label for="username">Username</label>
+          <input
+            class="text-input"
+            data-testid="username-input"
+            id="username"
+            name="username"
+            required
+            type="text"
+          />
+        </div>
+        <div>
+          <label for="password">Password</label>
+          <input
+            class="text-input"
+            data-testid="password-input"
+            id="password"
+            name="password"
+            required
+            type="password"
+          />
+        </div>
+        <div class="button-row">
+          <button
+            class="button--primary"
+            data-testid="login-submit-button"
+            type="submit"
+          >
+            Sign In
+          </button>
+        </div>
+      </form>
+
+      <div class="credential-grid" data-testid="demo-credentials">
+        <div class="credential-card">
+          <strong>Admin</strong>
+          <span>`admin` / `admin123`</span>
+        </div>
+        <div class="credential-card">
+          <strong>Viewer</strong>
+          <span>`viewer` / `viewer123`</span>
+        </div>
+      </div>
+    </article>
+  </section>
+{% endblock %}
