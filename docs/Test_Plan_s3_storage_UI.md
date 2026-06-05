@@ -1,134 +1,235 @@
-# Test Plan:
+# Test Plan
 
 ## 1. Test Objectives
-The objective of this testing is to verify and validate that the S3 implementation in the frontend works as expected and meets the defined business and technical requirements. 
 
-Since the focus of the testing will be on the validation of the interaction with the frontend of the software using the S3 implementation, the testing will involve UI interactions with the software. Thus, the QA team will validate specifically the functional behaviour, the usability, the reliability, security and performance of the programming interface of the product.
+The objective of this test plan is to verify and validate that the frontend implementation of the `Secure S3 File Portal` works as expected and supports the intended Phase 1 file workflows.
+
+This test plan focuses on validation through the UI, using the browser as the main interaction point and the MinIO console as a secondary verification point when needed. The plan also prepares the foundation for later Selenium-based automation.
+
+Current objectives:
+
+* Verify that the portal is available and usable through the browser
+* Verify that MinIO-backed file workflows operate correctly through the UI
+* Verify that file metadata shown in the UI is correct
+* Verify that the portal provides clear feedback for positive and negative scenarios
+* Verify that the portal degrades gracefully when MinIO is unavailable
+* Document exploratory findings to support future test automation design
 
 ## 2. Entry, Suspension, and Exit Criteria
-This section defines the criteria for starting, suspending, and completing the test cycle.
+
+This section defines the criteria for starting, suspending, and completing the current test cycle.
 
 ### 2.1 Entry Criteria
-- MinIO container is running.
-- FastAPI service is available.
-- Required environment variables are configured.
-- Test data and sample files are available.
-- Smoke tests can be executed locally.
+
+* FastAPI portal is running and reachable at `http://localhost:8000`
+* MinIO is running and reachable at `http://localhost:9001`
+* Required environment variables and local credentials are configured
+* Sample files are available for testing
+* Browser access is available
+* `docs/Exploratory_Testing.md` is available as the scenario execution reference
 
 ### 2.2 Suspension Criteria
-- If 40% or more of the test cases fail.
-- The API service is unavailable.
-- MinIO cannot be reached.
-- Test credentials are invalid or missing.
+
+* The portal is unavailable
+* MinIO is unavailable for scenarios that require storage access
+* Major environment instability prevents reliable execution
+* A blocker defect prevents continuation of a large part of the planned scope
 
 ### 2.3 Exit Criteria
-- If 98% of all test cases pass.
-- All critical and high-severity defects are resolved or accepted.
-- Smoke and regression tests pass.
-- Test results are documented.
+
+* Planned Phase 1 exploratory scenarios have been executed
+* Critical and high-severity issues are documented
+* Results and findings are captured in the exploratory testing document
+* Test strategy and test plan are updated to reflect the observed product behavior
+* The project is ready to move into the next implementation and automation phases
 
 ## 3. Test Resources
-The validation of the feature will require the following resources:
+
+The validation of this frontend feature requires the following resources:
+
 * One SDET
-* S3 like-server (local S3-compatible without AWS IAM)
-* Boto3 (AWS SDK for Python)
-* Python
-* Pytest
-* Docker (MinIO container)
-* FastAPI wrapper service
+* FastAPI `Secure S3 File Portal`
+* MinIO local S3-compatible storage
+* Docker Compose
+* Terminal access
+* Web browser
+* Sample test files
+* MinIO console access
 
 ## 4. Test Environment
-The installation of the software will require the following:
-* MacOS
-* AWS S3 SDK
-* MinIO container (local S3-compatible without AWS IAM.)
-* Small FastAPI wrapper service that uploads/downloads files to S3.
-* Python modules:
-    - fastapi
-    - uvicorn
-    - boto3
-    - python-dotenv
-    - pytest
-    - pytest-asyncio
-    - httpx
-    - requests
+
+The test environment for the current implementation includes:
+
+* Local machine
+* Docker and Docker Compose
+* FastAPI application
+* MinIO container
+* Modern web browser
+
+### Environment details
+
+* Portal UI: `http://localhost:8000`
+* Health endpoint: `http://localhost:8000/health`
+* MinIO API: `http://localhost:9000`
+* MinIO Console: `http://localhost:9001`
+* MinIO credentials:
+  * Username: `minioadmin`
+  * Password: `minioadmin123`
+
+### Optional local app execution
+
+If the portal is run directly with `uvicorn`, MinIO should still be running separately so the portal can connect to storage.
 
 ## 5. Scope
 
 ### In Scope
-- API validation for upload, download, delete, metadata, and presigned URLs.
-- MinIO bucket readiness and object storage workflows.
-- Negative testing for missing buckets, missing objects, invalid credentials, and service unavailability.
-- Basic performance and reliability validation.
+
+The current test cycle includes validation of the Phase 1 frontend implementation:
+
+* Portal page availability and basic usability
+* Health endpoint verification
+* Storage status visibility
+* Empty-state behavior
+* File upload workflows
+* File download workflow
+* File delete workflow
+* File metadata validation in the UI
+* Positive and negative flash messages
+* Browser refresh behavior after actions
+* Graceful degraded behavior when MinIO is unavailable
+* Cross-checking file actions in the MinIO console
 
 ### Out of Scope
-- AWS IAM validation.
-- Real AWS S3 billing, replication, lifecycle policies, and multi-region behaviour.
-- Frontend/UI testing.
+
+The following items are out of scope for the current Phase 1 test cycle:
+
+* Login and logout validation
+* Session handling validation
+* `admin` and `viewer` role validation
+* Access denied behavior
+* Audit log validation
+* Seed and reset script validation
+* Real AWS S3 integration
+* AWS IAM validation
+* Bucket administration actions outside the portal UI
+* UI test automation execution
 
 ## 6. Test Coverage
-- Unit tests for framework utilities
-- Smoke tests for service and bucket readiness
-- Integration tests for upload/download/delete workflows
-- Negative tests for missing objects, empty files, invalid credentials, and unavailable services
 
-### Test Scenarios
-tests/unit/
-  test_file_factory.py
-  test_config_loader.py
+The current test coverage is based on the exploratory scenarios documented in `docs/Exploratory_Testing.md`.
 
-tests/smoke/
-  test_minio_health.py
-  test_bucket_create_delete.py
+### Coverage Areas
 
-tests/integration/
-  test_upload_download_object.py
-  test_object_metadata.py
-  test_presigned_url.py
+* Positive workflows
+  * Health endpoint
+  * Upload
+  * Download
+  * Delete
 
-tests/negative/
-  test_invalid_credentials.py
-  test_missing_bucket.py
-  test_missing_object.py
+* UI clarity and usability
+  * Page title and description
+  * Storage status
+  * Empty-state messaging
+  * Stored file information
+  * Available actions
+  * Refresh behavior
 
-### Test Data
-The test suite will use:
-- Small text files
-- Empty files
-- Files with metadata
-- Unsupported file types, if validation exists
-- Large files for basic upload/download validation
-- Missing object keys for negative scenarios
+* Metadata validation
+  * File name
+  * Object key
+  * Uploaded by
+  * Content type
+  * Uploaded at
+  * Size
 
-### Defect Management
-Defects will be documented using GitHub Issues. Each defect should include:
-- Summary
-- Steps to reproduce
-- Expected result
-- Actual result
-- Severity
-- Logs or screenshots, if applicable
+* Negative validation
+  * Upload without selecting a file
+  * Upload empty file
+  * Upload large file boundary behavior
+  * Upload file with non-ASCII characters
+  * MinIO unavailable behavior
 
-## 9. Schedule & Estimates
-This project is planned as a personal automation framework. Test design, implementation, and execution will be completed iteratively as framework features are added.
+* Edge validation
+  * Unusual or long file names
+  * Large file within accepted range
+  * Different file types
 
-Estimated phases:
-- Phase 1: Environment setup and smoke tests
-- Phase 2: Core API workflow tests
-- Phase 3: Negative and reliability tests
-- Phase 4: Regression execution and documentation
+### Detailed Scenario Reference
+
+Detailed manual scenarios are maintained in:
+
+* `docs/Exploratory_Testing.md`
+
+## 7. Test Data
+
+The test cycle will use:
+
+* Small text files
+* Image files
+* Empty files
+* Files with long names
+* Files with non-ASCII characters in the file name
+* Different file types
+* Larger files for boundary exploration
+
+## 8. Defect Management
+
+Defects will be documented using GitHub Issues or project notes. Each defect should include:
+
+* Summary
+* Steps to reproduce
+* Expected result
+* Actual result
+* Severity
+* Logs, screenshots, or supporting notes when applicable
+
+## 9. Schedule and Estimates
+
+This project is being built iteratively, so test work will also be completed in phases.
+
+Planned sequence:
+
+* Phase 1:
+  * Manual exploratory testing
+  * Test strategy
+  * Test plan
+  * Exploratory findings review
+
+* Phase 2:
+  * Validation of login, roles, audit entries, and seed/reset behavior
+  * Updates to exploratory testing, strategy, and plan documents
+
+* Phase 3:
+  * Selenium Page Object Model design
+  * Framework utilities
+  * Page object implementation
+
+* Phase 4:
+  * Smoke automation
+  * Regression automation
+  * Negative automation
+  * CI integration planning and execution
 
 ## 10. Test Deliverables
-* Before testing:
-    * Test plan
-    * Test strategy
-    * README about details of the S3-like server deployment
-* During testing:
-    * Test cases
-    * Automated tests
-    * Automation framework
-    * Logs
-    * Bug reports
-* After testing:
-    * Test Results
-    * Release notes
+
+### Before testing
+
+* Test plan
+* Test strategy
+* Environment setup instructions
+
+### During testing
+
+* Exploratory testing notes
+* Test scenarios
+* Logs
+* Screenshots when useful
+* Defect reports
+
+### After testing
+
+* Updated exploratory testing document
+* Updated test plan
+* Updated test strategy
+* Execution summary / findings
+* Inputs for future Selenium automation design
