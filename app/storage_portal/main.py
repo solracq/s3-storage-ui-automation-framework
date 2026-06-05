@@ -1,7 +1,7 @@
 """
-Application entry point
-Creates the FastAPI app
+Application entry point for the Secure S3 File Portal.
 """
+
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
@@ -9,12 +9,15 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.responses import Response
+from starlette.middleware.sessions import SessionMiddleware
 
 from app.storage_portal.routes.ui import router as ui_router
+from app.storage_portal.services.audit import AuditService
+from app.storage_portal.services.auth import AuthService
 from app.storage_portal.services.storage import StorageService
 from app.storage_portal.settings import get_settings
 
-# Set the base directory (app/storage_portal)
+APP_SETTINGS = get_settings()
 BASE_DIR = Path(__file__).resolve().parent
 STYLESHEET_PATH = BASE_DIR / "static" / "styles.css"
 STYLESHEET_CONTENT = STYLESHEET_PATH.read_text(encoding="utf-8")
@@ -23,38 +26,31 @@ STYLESHEET_CONTENT = STYLESHEET_PATH.read_text(encoding="utf-8")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    Function to define the FastAPI's startup/shutdown hook pattern.
-    It runs when the app starts and is a good place to initialize shared services.
-
-    Args:
-        app (FastAPI): FastAPI app
+    Initialize shared services when the FastAPI app starts.
     """
-    settings = get_settings()
-    app.state.settings = settings
-    app.state.storage_service = StorageService(settings)
+    app.state.settings = APP_SETTINGS
+    app.state.storage_service = StorageService(APP_SETTINGS)
+    app.state.auth_service = AuthService(APP_SETTINGS)
+    app.state.audit_service = AuditService(APP_SETTINGS)
 
     try:
-        # check that bucket exists at startup
         app.state.storage_service.ensure_bucket()
     except Exception:
-        # The dashboard surfaces storage readiness so local development still starts cleanly.
+        # The dashboard and health endpoint surface storage readiness in the UI.
         pass
 
     yield
 
-# Create the FastAPI app with a title and the custom lifespan
+
 app = FastAPI(title="Secure S3 File Portal", lifespan=lifespan)
-# Register the UI routes from routes/ui.py
+app.add_middleware(SessionMiddleware, secret_key=APP_SETTINGS.session_secret_key)
 app.include_router(ui_router)
 
 
 @app.get("/static/styles.css", name="portal_stylesheet")
 async def portal_stylesheet() -> Response:
     """
-    Serve the portal stylesheet without relying on Starlette's StaticFiles threadpool path.
-
-    Returns:
-        Response: CSS content for the portal UI
+    Serve the portal stylesheet without relying on StaticFiles.
     """
     return Response(content=STYLESHEET_CONTENT, media_type="text/css")
 
@@ -62,15 +58,8 @@ async def portal_stylesheet() -> Response:
 @app.get("/health")
 async def health(request: Request) -> dict[str, str | bool | None]:
     """
-    Defines a small health endpoint
-
-    Args:
-        request (Request): fastapi request type
-
-    Returns:
-        dict[str, str | bool | None]: return status, storage_ready, bucket and storage_error
+    Return the current application and storage health state.
     """
-    # Check storage connectivity
     storage_ready, storage_error = request.app.state.storage_service.check_connection()
     return {
         "status": "ok" if storage_ready else "degraded",
