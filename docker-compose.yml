@@ -16,10 +16,14 @@ services:
       MINIO_SECRET_KEY: minioadmin123
       MINIO_BUCKET_NAME: secure-file-portal
       MINIO_SECURE: "false"
+      SESSION_SECRET_KEY: local-phase2-demo-secret
       DEFAULT_UPLOAD_ACTOR: phase1-demo-admin
     # Publish the FastAPI UI to http://localhost:8000
     ports:
       - "8000:8000"
+    # Persist runtime auth and audit files so scripts and the container share the same state
+    volumes:
+      - ./runtime:/workspace/runtime
 
   minio:
     # Official MinIO container image
