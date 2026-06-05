@@ -12,12 +12,48 @@
   <body>
     {# Shared page shell wrapping page-specific content and footer messaging. #}
     <main class="page-shell">
+      <header class="topbar" data-testid="portal-topbar">
+        <a class="brand-mark" data-testid="brand-link" href="{{ url_for('dashboard') }}">
+          Secure S3 Portal
+        </a>
+        <div class="topbar-actions">
+          {% if current_user %}
+            <nav class="topbar-nav" data-testid="topbar-nav">
+              <a data-testid="nav-dashboard-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+              {% if current_user.can_view_audit_logs %}
+                <a data-testid="nav-audit-link" href="{{ url_for('audit_logs') }}">Audit Log</a>
+              {% endif %}
+            </nav>
+            <div class="user-badge" data-testid="current-user-badge">
+              <strong>{{ current_user.display_name }}</strong>
+              <span>{{ current_user.username }} | {{ current_user.role }}</span>
+            </div>
+            <form action="{{ url_for('logout') }}" method="post">
+              <button
+                class="button button--secondary"
+                data-testid="logout-button"
+                type="submit"
+              >
+                Logout
+              </button>
+            </form>
+          {% else %}
+            <a
+              class="button button--secondary"
+              data-testid="login-nav-link"
+              href="{{ url_for('login_page') }}"
+            >
+              Login
+            </a>
+          {% endif %}
+        </div>
+      </header>
       {# Child templates inject their main content here. #}
       {% block content %}{% endblock %}
       {# Shared footer communicating current project scope to users and testers. #}
       <footer data-testid="footer-note">
-        Senior SDET portfolio build in progress. Authentication, roles, and audit
-        logging arrive in Phase 2.
+        Senior SDET portfolio build in progress. Selenium automation arrives in
+        Phase 3.
       </footer>
     </main>
   </body>
