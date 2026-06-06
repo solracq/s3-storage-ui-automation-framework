@@ -6,9 +6,9 @@
     <span class="eyebrow">Secure Demo Environment</span>
     <h1 data-testid="page-heading">Secure S3 File Portal</h1>
     <p data-testid="page-description">
-      Phase 1 starts with the storage workflow foundation: a security-themed FastAPI
-      UI, stable automation hooks, and real MinIO-backed object operations. Authentication, 
-      role controls, and audit logging will be available on Phase 2.
+      Phase 2 builds on the storage workflow foundation by introducing login,
+      role-aware UI behavior, and audit visibility while keeping the portal easy
+      to validate through the browser.
     </p>
   </section>
 
@@ -49,7 +49,15 @@
         </div>
         <div>
           <strong>Current Mode</strong>
-          <span data-testid="portal-mode">Phase 1 foundation build</span>
+          <span data-testid="portal-mode">Phase 2 access-control build</span>
+        </div>
+        <div>
+          <strong>Current User</strong>
+          <span data-testid="current-portal-user">{{ current_user.username }}</span>
+        </div>
+        <div>
+          <strong>Current Role</strong>
+          <span data-testid="current-portal-role">{{ current_user.role }}</span>
         </div>
       </div>
 
@@ -61,31 +69,48 @@
       {% endif %}
     </article>
 
-    {# File upload form for the current Phase 1 demo actor. #}
-    <article class="panel" data-testid="upload-panel">
-      <h2>Upload File</h2>
-      <form
-        class="upload-form"
-        data-testid="upload-form"
-        action="{{ url_for('upload_file') }}"
-        enctype="multipart/form-data"
-        method="post"
-      >
-        <div>
-          <label for="file">Choose file</label>
-          <input id="file" name="file" type="file" data-testid="upload-input" />
+    {% if current_user.can_upload %}
+      {# File upload form for the admin user. #}
+      <article class="panel" data-testid="upload-panel">
+        <h2>Upload File</h2>
+        <p class="panel-copy">
+          The admin role can upload new files, delete existing ones, and review
+          portal audit activity.
+        </p>
+        <form
+          class="upload-form"
+          data-testid="upload-form"
+          action="{{ url_for('upload_file') }}"
+          enctype="multipart/form-data"
+          method="post"
+        >
+          <div>
+            <label for="file">Choose file</label>
+            <input id="file" name="file" type="file" data-testid="upload-input" />
+          </div>
+          <div class="button-row">
+            <button
+              class="button--primary"
+              data-testid="upload-submit-button"
+              type="submit"
+            >
+              Upload to Secure Bucket
+            </button>
+          </div>
+        </form>
+      </article>
+    {% else %}
+      <article class="panel" data-testid="viewer-role-panel">
+        <h2>Viewer Access</h2>
+        <p class="panel-copy">
+          The viewer role can browse and download files, but cannot upload,
+          delete, or access audit logs.
+        </p>
+        <div class="status-pill status-pill--viewer" data-testid="viewer-role-status">
+          Download-Only Access
         </div>
-        <div class="button-row">
-          <button
-            class="button--primary"
-            data-testid="upload-submit-button"
-            type="submit"
-          >
-            Upload to Secure Bucket
-          </button>
-        </div>
-      </form>
-    </article>
+      </article>
+    {% endif %}
   </section>
 
   {# Main file listing area with conditional rendering for empty and populated states. #}
@@ -132,16 +157,18 @@
                     >
                       Download
                     </a>
-                    <form action="{{ url_for('delete_file') }}" method="post">
-                      <input name="object_key" type="hidden" value="{{ item.object_key }}" />
-                      <button
-                        class="button button--danger"
-                        data-testid="delete-file-button"
-                        type="submit"
-                      >
-                        Delete
-                      </button>
-                    </form>
+                    {% if current_user.can_delete %}
+                      <form action="{{ url_for('delete_file') }}" method="post">
+                        <input name="object_key" type="hidden" value="{{ item.object_key }}" />
+                        <button
+                          class="button button--danger"
+                          data-testid="delete-file-button"
+                          type="submit"
+                        >
+                          Delete
+                        </button>
+                      </form>
+                    {% endif %}
                   </div>
                 </td>
               </tr>
