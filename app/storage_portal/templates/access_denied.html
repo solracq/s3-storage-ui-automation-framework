@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="auth-shell" data-testid="access-denied-page">
+    <article class="panel auth-card">
+      <span class="eyebrow">Restricted Action</span>
+      <h1 data-testid="access-denied-heading">Access Denied</h1>
+      <p class="panel-copy" data-testid="access-denied-message">
+        {{ access_denied_message }}
+      </p>
+      <div class="button-row">
+        <a
+          class="button button--secondary"
+          data-testid="back-to-dashboard-link"
+          href="{{ url_for('dashboard') if current_user else url_for('login_page') }}"
+        >
+          {% if current_user %}Return to Dashboard{% else %}Return to Login{% endif %}
+        </a>
+      </div>
+    </article>
+  </section>
+{% endblock %}
