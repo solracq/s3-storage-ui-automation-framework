@@ -43,7 +43,7 @@ The frontend deployment of the product is divided into two parts:
 * Phase 1: FastAPI + Jinja2 UI + MinIO integration
 * Phase 2: Login, roles, audit entries, seed/reset scripts
 
-At the moment, only Phase 1 has been implemented. It includes the following:
+At the moment, Phase 1 and Phase 2 have been implemented. They include the following:
 
 * FastAPI application scaffold
 * Jinja2 dashboard UI for the Secure S3 File Portal
@@ -52,15 +52,25 @@ At the moment, only Phase 1 has been implemented. It includes the following:
 * Docker Compose setup for the portal and MinIO
 * `/health` endpoint for basic runtime diagnostics
 * Graceful degraded startup when MinIO is unavailable
+* Login and logout flows for local demo users
+* Session handling for authenticated portal access
+* Role-based behavior for `admin` and `viewer`
+* Access denied handling for unauthorized actions
+* Audit log capture and audit log UI visibility
+* Seed and reset scripts for repeatable local testing
 
-### Testing Phase 1
+### Testing Phase 1 and Phase 2
 
-The exploratory testing for Phase 1 includes the following areas:
+The exploratory testing for Phase 1 and Phase 2 includes the following areas:
 
 * Happy-path file workflows such as upload, download, and delete
+* Authentication and invalid credential combinations
+* Role-based UI behavior for `admin` and `viewer`
 * UI clarity, messages, page structure, and usability scenarios
 * File metadata correctness
-* Negative scenarios such as empty file behavior, unusual filenames, repeated uploads, and browser refresh after actions
+* Negative scenarios such as empty file behavior, invalid credentials, unusual filenames, repeated uploads, and browser refresh after actions
+* Audit logging visibility and unauthorized access behavior
+* Credential entry methods such as typing, copy-pasting, and auto-fill when applicable
 * Edge scenarios
 * Cross-browser validation
 
@@ -96,6 +106,9 @@ docker logs secure-s3-portal-app
 * The `Secure S3 Portal App` has been deployed via Docker Compose or directly on a machine.
 * The `Secure S3 Portal App` terminal is available.
 * A web browser is open.
+* The demo credentials are available:
+  * `admin / admin123`
+  * `viewer / viewer123`
 
 ### Positive Scenarios (Happy Path)
 
@@ -115,6 +128,7 @@ docker logs secure-s3-portal-app
 **Prerequisite**
 
 * No file has been uploaded to the `Secure S3 File Portal`.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a file by clicking the `Choose File` button in the `Upload File` section of the portal.
@@ -133,6 +147,7 @@ docker logs secure-s3-portal-app
 **Prerequisite**
 
 * No file has been uploaded to the `Secure S3 File Portal`.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a file by dragging it into the `Upload File` section of the portal.
@@ -151,6 +166,7 @@ docker logs secure-s3-portal-app
 **Prerequisite**
 
 * A file has already been uploaded to the `Secure S3 File Portal`.
+* Sign in as `admin` or `viewer`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Select and download the existing file.
@@ -166,6 +182,7 @@ docker logs secure-s3-portal-app
 
 * A file has already been uploaded to the `Secure S3 File Portal`.
 * The uploaded file is displayed in the `Stored Files` section of the portal.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Delete the file by clicking the `Delete` button.
@@ -184,6 +201,7 @@ docker logs secure-s3-portal-app
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 Access the `Secure S3 File Portal` and verify the following:
 
@@ -200,7 +218,7 @@ Access the `Secure S3 File Portal` and verify the following:
 * `Storage Status` shows `Connected`.
 * The bucket name `secure-file-portal` is shown.
 * The endpoint `minio:9000` is displayed.
-* The current mode `Phase 1 foundation build` is displayed.
+* The current mode `Phase 2 access-control build` is displayed.
 * The `Upload File` section shows:
   * A `Choose File` button
   * `No file chosen` as the initial/default state
@@ -219,6 +237,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Check the `Stored Files` section.
@@ -234,6 +253,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a file.
@@ -248,6 +268,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a file.
@@ -266,20 +287,22 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a file.
-3. Verify that the `uploaded by` information matches the current Phase 1 portal actor.
+3. Verify that the `uploaded by` information matches the currently signed-in upload user.
 
 **Output**
 
-3) The uploaded file shows `phase1-demo-admin` in the `uploaded by` column.
+3) The uploaded file shows `admin` in the `uploaded by` column.
 
 #### Scenario 11: Verify the content type of the uploaded file in the File Portal
 
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a text file and an image.
@@ -295,6 +318,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a file.
@@ -310,6 +334,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a file.
@@ -324,6 +349,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a file.
@@ -339,6 +365,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a file.
@@ -360,6 +387,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Without choosing a file, click the upload button.
@@ -375,6 +403,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload an empty file.
@@ -390,6 +419,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a large file that exceeds the allowed limit (more than 1 MB).
@@ -398,13 +428,14 @@ Access the `Secure S3 File Portal` and verify the following:
 **Output**
 
 3) No file is uploaded.
-3) The error message `There was an error parsing the body` is displayed.
+3) A clear message is displayed indicating that the portal supports uploads up to `1 MB` only.
 
 #### Scenario 19: Upload a file with non-ASCII characters in the file name
 
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a file with non-ASCII characters in the file name, for example `こんにちは`.
@@ -421,6 +452,7 @@ Access the `Secure S3 File Portal` and verify the following:
 
 * The `Secure S3 Portal App` is running.
 * MinIO has been stopped or is unavailable.
+* Sign in as `admin` or `viewer`.
 
 1. Stop the MinIO service or make MinIO unavailable.
 2. Go to the `Secure S3 File Portal`.
@@ -441,6 +473,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a file with an unusual or long name.
@@ -456,6 +489,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload a large file within the allowed limit (`<= 1 MB`).
@@ -471,6 +505,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Prerequisite**
 
 * Secure S3 File Portal initial state with no previously uploaded files.
+* Sign in as `admin`.
 
 1. Go to the `Secure S3 File Portal`.
 2. Upload different file types (`txt`, `pdf`, `docx`, `csv`, `jpeg`, `png`, `mp4`, `wav`, `md`, and files without an extension).
@@ -480,3 +515,99 @@ Access the `Secure S3 File Portal` and verify the following:
 
 3) The files can be uploaded successfully in the File Portal.
 3) The files are displayed in the MinIO console.
+
+### Phase 2 Authentication, Role, and Credential Handling Scenarios
+
+#### Scenario 24: Attempt to log in as `admin` using the correct username and the wrong password, and vice versa
+
+**Prerequisite**
+
+* The `Secure S3 File Portal` login page is accessible.
+
+1. Go to the `Secure S3 File Portal` login page.
+2. Enter the correct `admin` username and an incorrect password, then submit.
+3. Enter an incorrect `admin` username and the correct password, then submit.
+4. Verify that access to the portal is denied in both cases.
+
+**Output**
+
+2) The login is unsuccessful.
+2) The error message `Invalid username or password.` is displayed.
+3) The login is unsuccessful.
+3) The error message `Invalid username or password.` is displayed.
+4) The user remains blocked from the portal dashboard in both attempts.
+
+#### Scenario 25: Attempt to log in as `viewer` using the correct username and the wrong password, and vice versa
+
+**Prerequisite**
+
+* The `Secure S3 File Portal` login page is accessible.
+
+1. Go to the `Secure S3 File Portal` login page.
+2. Enter the correct `viewer` username and an incorrect password, then submit.
+3. Enter an incorrect `viewer` username and the correct password, then submit.
+4. Verify that access to the portal is denied in both cases.
+
+**Output**
+
+2) The login is unsuccessful.
+2) The error message `Invalid username or password.` is displayed.
+3) The login is unsuccessful.
+3) The error message `Invalid username or password.` is displayed.
+4) The user remains blocked from the portal dashboard in both attempts.
+
+#### Scenario 26: Validate credential input methods on the login page
+
+**Prerequisite**
+
+* The `Secure S3 File Portal` login page is accessible.
+
+1. Enter valid credentials by typing them on the keyboard and submit.
+2. Log out.
+3. Enter valid credentials by copy-pasting them into the username and password fields and submit.
+4. Log out.
+5. If the browser provides auto-fill for the login fields, use it to populate the credentials and submit.
+
+**Output**
+
+1) The portal accepts credentials entered by typing and allows successful login.
+3) The portal accepts credentials entered by copy-pasting and allows successful login.
+5) If auto-fill is available in the browser, the portal accepts the auto-filled credentials and allows successful login.
+5) If auto-fill is not available in the browser, the scenario is marked as not applicable.
+
+#### Scenario 27: Validate buttons, links, control icons, badges, and text for the `admin` role
+
+**Prerequisite**
+
+* Sign in as `admin`.
+
+1. Go to the `Secure S3 File Portal`.
+2. Review the top bar, dashboard panels, upload section, and file actions.
+3. Verify that the `admin` role sees the expected buttons, links, control icons, badges, and descriptive text.
+
+**Output**
+
+2) The top bar shows `Dashboard`, `Audit Log`, the current user badge, and the `Logout` button.
+2) The dashboard shows the `Upload File` section with the `Choose File` and `Upload to Secure Bucket` controls.
+3) The `Stored Files` section shows `Download` and `Delete` actions for the `admin` role.
+3) The page text reflects the signed-in `admin` user and the `admin` role.
+3) The available controls are visible, readable, and clickable.
+
+#### Scenario 28: Validate buttons, links, control icons, badges, and text for the `viewer` role
+
+**Prerequisite**
+
+* Sign in as `viewer`.
+
+1. Go to the `Secure S3 File Portal`.
+2. Review the top bar, dashboard panels, and file actions.
+3. Verify that the `viewer` role sees only the allowed buttons, links, control icons, badges, and descriptive text.
+
+**Output**
+
+2) The top bar shows `Dashboard`, the current user badge, and the `Logout` button.
+2) The `Audit Log` link is not shown for the `viewer` role.
+2) The dashboard shows the `Viewer Access` panel instead of the upload section.
+3) The `Stored Files` section shows the `Download` action only.
+3) The `Delete` action is not displayed for the `viewer` role.
+3) The page text reflects the signed-in `viewer` user and the `viewer` role.
