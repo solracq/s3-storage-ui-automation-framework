@@ -21,6 +21,7 @@ class LoginPage(BasePage):
     # Stable data-testid selectors keep the page object independent from CSS styling changes.
     PAGE_ROOT: Locator = (By.CSS_SELECTOR, "[data-testid='login-page']")
     PAGE_HEADING: Locator = (By.CSS_SELECTOR, "[data-testid='login-heading']")
+    PAGE_DESCRIPTION: Locator = (By.CSS_SELECTOR, "[data-testid='login-description']")
     LOGIN_FORM: Locator = (By.CSS_SELECTOR, "[data-testid='login-form']")
     USERNAME_INPUT: Locator = (By.CSS_SELECTOR, "[data-testid='username-input']")
     PASSWORD_INPUT: Locator = (By.CSS_SELECTOR, "[data-testid='password-input']")
