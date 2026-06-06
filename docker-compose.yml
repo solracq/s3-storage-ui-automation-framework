@@ -18,6 +18,7 @@ services:
       MINIO_SECURE: "false"
       SESSION_SECRET_KEY: local-phase2-demo-secret
       DEFAULT_UPLOAD_ACTOR: phase1-demo-admin
+      MAX_UPLOAD_SIZE_BYTES: 1048576
     # Publish the FastAPI UI to http://localhost:8000
     ports:
       - "8000:8000"
