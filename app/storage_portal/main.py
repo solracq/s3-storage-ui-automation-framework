@@ -9,6 +9,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.responses import Response
+from starlette.formparsers import MultiPartParser
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.storage_portal.routes.ui import router as ui_router
@@ -29,6 +30,7 @@ async def lifespan(app: FastAPI):
     Initialize shared services when the FastAPI app starts.
     """
     app.state.settings = APP_SETTINGS
+    MultiPartParser.spool_max_size = APP_SETTINGS.max_upload_request_size_bytes
     app.state.storage_service = StorageService(APP_SETTINGS)
     app.state.auth_service = AuthService(APP_SETTINGS)
     app.state.audit_service = AuditService(APP_SETTINGS)
