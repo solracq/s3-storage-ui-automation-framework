@@ -127,6 +127,17 @@ class StorageService:
         self.ensure_bucket()
         self._client.remove_object(self.bucket_name, object_key)
 
+    def delete_all_files(self) -> int:
+        """
+        Delete every stored object in the configured bucket.
+        """
+        self.ensure_bucket()
+        deleted_count = 0
+        for object_item in self._client.list_objects(self.bucket_name, recursive=True):
+            self._client.remove_object(self.bucket_name, object_item.object_name)
+            deleted_count += 1
+        return deleted_count
+
     def _build_object_key(self, filename: str) -> str:
         """
         Generate a unique object key while preserving the original filename.
