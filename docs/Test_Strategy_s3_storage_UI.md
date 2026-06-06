@@ -4,7 +4,7 @@
 
 This test strategy defines the overall testing approach for the `Secure S3 File Portal`. It explains the scope, test levels, test types, environments, risks, tools, and quality practices that will be used to validate the frontend implementation of the product.
 
-The current focus is on Phase 1 manual validation of the portal UI and the MinIO-backed file workflows. Future phases will extend this strategy to include authentication, roles, audit logging, and Selenium UI automation.
+The current focus is on manual validation of the implemented Phase 1 and Phase 2 portal behavior. Future phases will extend this strategy to include Selenium UI automation, reusable framework utilities, and broader automated regression coverage.
 
 ## 2. Test Scope
 
@@ -13,31 +13,33 @@ The scope of this strategy is the frontend behavior of the `Secure S3 File Porta
 ### What this validates in the current implementation
 
 * Portal availability through `http://localhost:8000`
+* Login and logout behavior for local demo users
+* Session-based access to authenticated portal pages
 * Health endpoint behavior through `http://localhost:8000/health`
 * Storage status display in the UI
+* Role-based behavior for `admin` and `viewer`
 * File upload, list, download, and delete workflows
+* Enforced upload size limit of `1 MB` per file
 * File metadata display, including filename, object key, uploaded by, content type, upload date/time, and size
 * Flash messages and UI feedback for positive and negative scenarios
 * Empty-state behavior
 * Page refresh behavior after file actions
+* Access denied behavior for unauthorized actions
+* Audit log capture and audit log UI visibility
+* Seed and reset scripts that support repeatable local validation
 * Graceful degraded behavior when MinIO is unavailable
 * UI testability through stable `data-testid` attributes
 * Cross-browser behavior of important UI workflows
 
 ### What is currently out of scope
 
-* Phase 2 functionality not yet implemented:
-  * Login and logout
-  * Session handling
-  * `admin` and `viewer` roles
-  * Access denied behavior
-  * Audit logging
-  * Seed and reset scripts
 * Direct backend SDK validation outside the UI
 * AWS IAM validation
 * Real AWS S3 integration
 * Bucket administration workflows not exposed by the portal UI
 * Performance, load, and stress testing beyond basic manual observation
+* Selenium-based automated execution
+* Jenkins-based CI execution
 
 ## 3. System Specifications
 
@@ -54,9 +56,11 @@ The system under test is a small local web application that uses MinIO as an S3-
 
 ### Current implementation notes
 
-* The current Phase 1 implementation uses a fixed portal actor: `phase1-demo-admin`
-* File workflows are available in the UI today
-* Authentication, authorization, and audit behavior are planned for Phase 2
+* The current implementation includes local demo users: `admin / admin123` and `viewer / viewer123`
+* The `admin` role can upload, download, delete, and view audit logs
+* The `viewer` role can view and download files but cannot upload, delete, or view audit logs
+* The current implementation enforces an upload size limit of `1 MB` per file
+* Audit events are persisted locally for authentication, file workflows, and unauthorized access attempts
 
 ## 4. Roles
 
@@ -81,6 +85,7 @@ The following testing types apply to the current frontend implementation:
 
 * Functional UI Testing
 * End-to-End Workflow Testing
+* Authentication and Authorization Testing
 * Usability and UI Clarity Testing
 * Data Integrity / Metadata Validation
 * Reliability and Recovery Testing
@@ -120,6 +125,16 @@ The following testing types apply to the current frontend implementation:
   * Severity: Medium
   * Mitigation: Distinguish between implemented behavior, known limitations, and future expected product behavior in test documentation.
 
+* Risk 7: Role-based behavior may appear correct in the UI but still require server-side enforcement checks.
+  * Occurrence: Medium
+  * Severity: High
+  * Mitigation: Validate both visual restrictions and direct unauthorized navigation or action attempts.
+
+* Risk 8: File uploads near or above the enforced `1 MB` limit may behave differently across browsers.
+  * Occurrence: Medium
+  * Severity: Medium
+  * Mitigation: Include explicit boundary testing for the enforced upload limit and repeat that coverage in more than one browser when possible.
+
 ## 8. Manual and Automation Strategy
 
 The testing approach will be phased.
@@ -129,6 +144,8 @@ The testing approach will be phased.
 * Begin with manual exploratory testing to understand the UI and the product behavior.
 * Use the portal UI as the primary validation layer.
 * Use the MinIO console as a supporting verification layer for upload and delete actions.
+* Use the audit log page as a supporting verification layer for login, file, and unauthorized access events.
+* Use the seed and reset scripts to return the environment to a known state when needed.
 * Include cross-browser checks for important workflows as part of manual validation.
 * Record findings in `docs/Exploratory_Testing.md`.
 * Use exploratory findings to drive the test plan, test strategy, and future automated coverage.
@@ -174,7 +191,7 @@ Planned CI behavior:
 * Archive logs, screenshots, and test reports
 * Expand CI execution later to include cross-browser coverage where practical
 
-At the current Phase 1 stage, CI automation is planned but not yet implemented.
+At the current Phase 2 stage, CI automation is planned but not yet implemented.
 
 ## 10. Test Logistics
 
