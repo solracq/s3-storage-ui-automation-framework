@@ -85,6 +85,11 @@ class StorageService:
         file_bytes = file.file.read()
         if not file_bytes:
             raise ValueError("Please upload a non-empty file.")
+        if len(file_bytes) > self._settings.max_upload_size_bytes:
+            raise ValueError(
+                f"Maximum upload size exceeded. This portal currently supports files up to "
+                f"{self._settings.max_upload_size_label}."
+            )
 
         object_key = self._build_object_key(file_name)
         content_type = file.content_type or "application/octet-stream"
