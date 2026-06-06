@@ -97,7 +97,7 @@ Reset stored objects, reseed users, and clear the audit log:
 ## Current MVP Constraints
 
 * This project uses local demo credentials only. It does not use AWS IAM or real AWS services.
-* The intended local upload scope for the MVP is files up to `1 MB`. This limit is part of the current validation scope and exploratory testing coverage.
+* The portal currently enforces a local upload limit of `1 MB` per file and returns a clear validation message when that limit is exceeded.
 * The current demo user store and audit log are file-based under `runtime/` to keep the project simple and repeatable for local testing.
 
 ## Target Product Scope
