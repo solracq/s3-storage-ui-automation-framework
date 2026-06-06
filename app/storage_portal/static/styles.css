@@ -39,6 +39,63 @@ a:hover {
 }
 
 /* Shared layout containers and hero presentation. */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: rgba(9, 20, 30, 0.84);
+  box-shadow: var(--shadow);
+}
+
+.brand-mark {
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.topbar-nav {
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.topbar-nav a {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.user-badge {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.user-badge strong {
+  color: var(--text);
+}
+
+.user-badge span {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
 .page-shell {
   width: min(1160px, calc(100% - 2rem));
   margin: 0 auto;
@@ -99,6 +156,13 @@ a:hover {
   margin-bottom: 0.75rem;
 }
 
+.panel-copy {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 /* Status and metadata styles for storage health information. */
 .status-pill {
   display: inline-flex;
@@ -118,6 +182,11 @@ a:hover {
 .status-pill--error {
   background: rgba(255, 117, 138, 0.15);
   color: var(--error);
+}
+
+.status-pill--viewer {
+  background: rgba(255, 211, 107, 0.12);
+  color: var(--warning);
 }
 
 .meta-list {
@@ -183,6 +252,15 @@ a:hover {
   color: var(--text);
 }
 
+.text-input {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+  color: var(--text);
+}
+
 .button-row {
   display: flex;
   gap: 0.75rem;
@@ -219,6 +297,39 @@ button[type="submit"] {
   background: rgba(255, 117, 138, 0.16);
   color: #ffd8de;
   border: 1px solid rgba(255, 117, 138, 0.24);
+}
+
+.auth-shell {
+  display: grid;
+  place-items: center;
+  min-height: 70vh;
+}
+
+.auth-card {
+  width: min(560px, 100%);
+}
+
+.credential-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.credential-card {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.credential-card strong {
+  color: var(--text);
+}
+
+.credential-card span {
+  color: var(--muted);
 }
 
 /* File table styling, inline actions, and monospace metadata display. */
@@ -280,8 +391,14 @@ footer {
 
 /* Mobile adjustments for tighter layouts and stacked actions. */
 @media (max-width: 720px) {
+  .topbar,
   .page-shell {
     width: min(100% - 1rem, 100%);
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .hero,
@@ -289,6 +406,8 @@ footer {
     padding: 1.2rem;
   }
 
+  .topbar-actions,
+  .topbar-nav,
   .button-row,
   .table-actions {
     flex-direction: column;
