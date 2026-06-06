@@ -3,9 +3,11 @@ from __future__ import annotations
 from pathlib import Path
 from urllib.parse import urlencode
 
-from fastapi import APIRouter, Depends, File, Form, Query, Request, UploadFile, status
+from fastapi import APIRouter, Depends, Form, Query, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
+from starlette.datastructures import UploadFile
+from starlette.formparsers import MultiPartException
 
 from app.storage_portal.models.auth import DemoUser
 from app.storage_portal.services.audit import AuditService
@@ -199,7 +201,6 @@ async def audit_logs(
 @router.post("/files/upload")
 async def upload_file(
     request: Request,
-    file: UploadFile = File(...),
     storage_service: StorageService = Depends(get_storage_service),
     auth_service: AuthService = Depends(get_auth_service),
     audit_service: AuditService = Depends(get_audit_service),
@@ -207,7 +208,6 @@ async def upload_file(
     """Handle admin-only file uploads and redirect back to the dashboard."""
     current_user = _get_current_user(request, auth_service)
     if current_user is None:
-        await file.close()
         return _login_redirect("Please sign in to access the portal.", "info")
 
     if not current_user.can_upload:
@@ -218,8 +218,26 @@ async def upload_file(
             outcome="denied",
             details="Attempted to upload a file.",
         )
-        await file.close()
         return _access_denied_redirect("Only the admin user can upload files.")
+
+    content_length_header = request.headers.get("content-length", "").strip()
+    if content_length_header.isdigit():
+        content_length = int(content_length_header)
+        if content_length > request.app.state.settings.max_upload_request_size_bytes:
+            return _dashboard_redirect(
+                "Maximum upload size exceeded. This portal currently supports files up to "
+                f"{request.app.state.settings.max_upload_size_label}.",
+                "error",
+            )
+
+    try:
+        form = await request.form()
+    except MultiPartException:
+        return _dashboard_redirect("Upload failed: invalid multipart form data.", "error")
+
+    file = form.get("file")
+    if not isinstance(file, UploadFile):
+        return _dashboard_redirect("Please choose a file before uploading.", "error")
 
     try:
         stored_file = storage_service.upload_file(
