@@ -4,13 +4,19 @@ A small, security-themed web UI built with FastAPI and Jinja2 templates, backed 
 
 ## Current Status
 
-Phase 1 has started with the first implementation slice.
+Phase 1 and Phase 2 are now implemented in the local MVP.
 
 Implemented now:
 
 * FastAPI application scaffold
 * Jinja2 dashboard UI for the Secure S3 File Portal
 * MinIO-backed upload, list, download, and delete workflows
+* Login and logout flows for local demo users
+* Role-based access for `admin` and `viewer`
+* Session handling for authenticated portal access
+* Audit logging for login, file, and unauthorized access events
+* Audit log UI page for the `admin` user
+* Seed and reset scripts for repeatable local testing
 * Stable `data-testid` attributes on important UI elements
 * Docker Compose setup for the portal and MinIO
 * `/health` endpoint for basic runtime diagnostics
@@ -18,10 +24,6 @@ Implemented now:
 
 Not implemented yet:
 
-* Login and logout
-* Role-based access for `admin` and `viewer`
-* Audit logging
-* Seed and reset scripts
 * Selenium automation framework
 * Smoke, regression, and negative test suites
 
@@ -46,15 +48,20 @@ This starts:
 * MinIO API on `http://localhost:9000`
 * MinIO Console on `http://localhost:9001`
 
+Demo credentials:
+
+* `admin / admin123`
+* `viewer / viewer123`
+
 You can also run the FastAPI app locally while keeping MinIO in Docker.
 
 ```bash
 docker compose up minio
 ```
 
-# Alternative way to run the application
+## Alternative Local Run
 
-If the user wants to run the FastAPI app directly on a machine (instead of inside Docker), or if the user wants a faster code/test iteration, then use the method below:
+If you want to run the FastAPI app directly on your machine instead of inside Docker, or if you want a faster code/test iteration loop, use the method below:
 
 ```bash
 python3 -m venv .venv
@@ -66,12 +73,32 @@ uvicorn app.storage_portal.main:app --reload
 **Note:**
 If MinIO is not running, the app still starts, but the dashboard and `/health` endpoint will show storage as unavailable.
 
+## Utility Scripts
+
+Seed the demo users and reset the audit log:
+
+```bash
+./.venv/bin/python scripts/seed_demo_users.py
+```
+
+Reset stored objects, reseed users, and clear the audit log:
+
+```bash
+./.venv/bin/python scripts/reset_environment.py
+```
+
 ## Endpoints
 
-* FastAPI UI (portal UI): `http://localhost:8000` -> This should show the "Secure S3 File Portal" ready to store files.
-* Health endpoint: `http://localhost:8000/health` -> This should return a JSON `"status":"ok"` and `"bucket":"secure-file-portal"`
+* FastAPI UI (portal UI): `http://localhost:8000` -> This redirects unauthenticated users to the login page and serves the Secure S3 File Portal after sign-in.
+* Health endpoint: `http://localhost:8000/health` -> This returns JSON such as `"status":"ok"` and `"bucket":"secure-file-portal"`
 * MinIO API: `http://localhost:9000`
 * MinIO Console: `http://localhost:9001` -> This should show bucket information and contents
+
+## Current MVP Constraints
+
+* This project uses local demo credentials only. It does not use AWS IAM or real AWS services.
+* The intended local upload scope for the MVP is files up to `1 MB`. This limit is part of the current validation scope and exploratory testing coverage.
+* The current demo user store and audit log are file-based under `runtime/` to keep the project simple and repeatable for local testing.
 
 ## Target Product Scope
 
@@ -82,10 +109,13 @@ The Secure S3 File Portal is intended to demonstrate:
 * File workflows
 * Audit logging
 * UI testability
+* Repeatable local environment setup and reset workflows
+* A future Selenium Page Object Model automation layer
 
 ## Logs
 
-If issues during deployment of the `Secure S3 File Portal', docker logs can be obtain in the following way:
+If you need application logs during local deployment or debugging, use:
+
 ```bash
 docker logs secure-s3-portal-app
 ```
@@ -103,19 +133,34 @@ s3-storage-ui-automation-framework/
 │       ├── main.py
 │       ├── models/
 │       │   ├── __init__.py
+│       │   ├── audit.py
+│       │   ├── auth.py
 │       │   └── storage.py
 │       ├── routes/
 │       │   ├── __init__.py
 │       │   └── ui.py
 │       ├── services/
 │       │   ├── __init__.py
+│       │   ├── audit.py
+│       │   ├── auth.py
 │       │   └── storage.py
 │       ├── settings.py
 │       ├── static/
 │       │   └── styles.css
 │       └── templates/
+│           ├── access_denied.html
+│           ├── audit_log.html
 │           ├── base.html
-│           └── dashboard.html
+│           ├── dashboard.html
+│           └── login.html
+├── docs/
+│   ├── Exploratory_Testing.md
+│   ├── Test_Plan_s3_storage_UI.md
+│   └── Test_Strategy_s3_storage_UI.md
 ├── docker-compose.yml
 ├── requirements.txt
+├── runtime/  (generated locally)
+└── scripts/
+    ├── reset_environment.py
+    └── seed_demo_users.py
 ```
