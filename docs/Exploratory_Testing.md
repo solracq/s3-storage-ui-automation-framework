@@ -222,6 +222,7 @@ Access the `Secure S3 File Portal` and verify the following:
 * The `Upload File` section shows:
   * A `Choose File` button
   * `No file chosen` as the initial/default state
+  * A `Maximum upload size: 1 MB per file.` note
   * An `Upload to Secure Bucket` button that is available and clickable
 * The `Stored Files` section is displayed with the following columns:
   * `FILENAME`
@@ -428,7 +429,7 @@ Access the `Secure S3 File Portal` and verify the following:
 **Output**
 
 3) No file is uploaded.
-3) A clear message is displayed indicating that the portal supports uploads up to `1 MB` only.
+3) The error message `Maximum upload size exceeded. This portal currently supports files up to 1 MB.` is displayed.
 
 #### Scenario 19: Upload a file with non-ASCII characters in the file name
 
@@ -589,6 +590,7 @@ Access the `Secure S3 File Portal` and verify the following:
 
 2) The top bar shows `Dashboard`, `Audit Log`, the current user badge, and the `Logout` button.
 2) The dashboard shows the `Upload File` section with the `Choose File` and `Upload to Secure Bucket` controls.
+2) The dashboard shows the upload note `Maximum upload size: 1 MB per file.`
 3) The `Stored Files` section shows `Download` and `Delete` actions for the `admin` role.
 3) The page text reflects the signed-in `admin` user and the `admin` role.
 3) The available controls are visible, readable, and clickable.
