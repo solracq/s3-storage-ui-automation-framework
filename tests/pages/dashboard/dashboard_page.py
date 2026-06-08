@@ -2,9 +2,15 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from selenium.webdriver.common.by import By
 
 from tests.pages.base_page import BasePage
+
+if TYPE_CHECKING:
+    from tests.pages.audit_records.audit_log_page import AuditLogPage
+    from tests.pages.login.login_page import LoginPage
 
 Locator = tuple[str, str]
 
@@ -127,19 +133,21 @@ class DashboardPage(BasePage):
         self.driver.find_element(*self.UPLOAD_INPUT).send_keys(file_path)
         self.driver.find_element(*self.UPLOAD_SUBMIT_BUTTON).click()
 
-    def click_audit_log_nav(self) -> "AuditLogPage":
+    def click_audit_log_nav(self) -> AuditLogPage:
         """
         Open the audit log page from the top navigation.
         """
+        # Runtime import stays local to avoid circular imports between page objects.
         from tests.pages.audit_records.audit_log_page import AuditLogPage
 
         self.driver.find_element(*self.AUDIT_LOG_NAV_LINK).click()
         return AuditLogPage(self.driver)
 
-    def click_logout(self) -> "LoginPage":
+    def click_logout(self) -> LoginPage:
         """
         Log out from the dashboard and return the login page object.
         """
+        # Runtime import stays local to avoid circular imports between page objects.
         from tests.pages.login.login_page import LoginPage
 
         self.driver.find_element(*self.LOGOUT_BUTTON).click()
