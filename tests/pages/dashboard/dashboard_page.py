@@ -22,7 +22,9 @@ class DashboardPage(BasePage):
     )
 
     def is_loaded(self) -> bool:
-        """Return whether the main dashboard elements are present and visible."""
+        """
+        Return whether the main dashboard elements are present and visible.
+        """
         page_hero = self.driver.find_elements(*self.PAGE_HERO)
         headings = self.driver.find_elements(*self.PAGE_HEADING)
         storage_panels = self.driver.find_elements(*self.STORAGE_STATUS_PANEL)
