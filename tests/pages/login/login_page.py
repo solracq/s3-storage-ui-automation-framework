@@ -56,10 +56,22 @@ class LoginPage(BasePage):
             username {str}: user's username
             password {str}: user's password
         Returns:
-            DashboardPage: upon successful login, retrun of the dashoboard page.
+            DashboardPage: upon successful login, return the dashboard page.
         """
         self.login_as(username, password)
         return DashboardPage(self.driver)
+
+    def login_as_expected_failure(self, username: str, password: str) -> "LoginPage":
+        """
+        Submit invalid credentials and remain on the login page.
+        Args:
+            username {str}: user's username
+            password {str}: user's password
+        Returns:
+            LoginPage: upon unsuccessful login, return the same login page.
+        """
+        self.login_as(username, password)
+        return self
 
     def click_login_nav_link(self) -> None:
         """
@@ -72,6 +84,13 @@ class LoginPage(BasePage):
         Click the sign-in button without filling the login fields first.
         """
         self.driver.find_element(*self.SUBMIT_BUTTON).click()
+
+    def clear_form(self) -> None:
+        """
+        Clear the username and password fields.
+        """
+        self.driver.find_element(*self.USERNAME_INPUT).clear()
+        self.driver.find_element(*self.PASSWORD_INPUT).clear()
 
     def get_flash_message_text(self) -> str:
         """
