@@ -16,10 +16,36 @@ class DashboardPage(BasePage):
 
     PAGE_HERO: Locator = (By.CSS_SELECTOR, "[data-testid='portal-hero']")
     PAGE_HEADING: Locator = (By.CSS_SELECTOR, "[data-testid='page-heading']")
+    PAGE_DESCRIPTION: Locator = (By.CSS_SELECTOR, "[data-testid='page-description']")
+    FLASH_MESSAGE: Locator = (By.CSS_SELECTOR, "[data-testid='flash-message']")
     STORAGE_STATUS_PANEL: Locator = (
         By.CSS_SELECTOR,
         "[data-testid='storage-status-panel']",
     )
+    STORAGE_STATUS: Locator = (By.CSS_SELECTOR, "[data-testid='storage-status']")
+    CURRENT_PORTAL_USER: Locator = (
+        By.CSS_SELECTOR,
+        "[data-testid='current-portal-user']",
+    )
+    CURRENT_PORTAL_ROLE: Locator = (
+        By.CSS_SELECTOR,
+        "[data-testid='current-portal-role']",
+    )
+    UPLOAD_PANEL: Locator = (By.CSS_SELECTOR, "[data-testid='upload-panel']")
+    UPLOAD_INPUT: Locator = (By.CSS_SELECTOR, "[data-testid='upload-input']")
+    UPLOAD_SUBMIT_BUTTON: Locator = (
+        By.CSS_SELECTOR,
+        "[data-testid='upload-submit-button']",
+    )
+    VIEWER_ROLE_PANEL: Locator = (By.CSS_SELECTOR, "[data-testid='viewer-role-panel']")
+    FILES_PANEL: Locator = (By.CSS_SELECTOR, "[data-testid='files-panel']")
+    FILES_TABLE: Locator = (By.CSS_SELECTOR, "[data-testid='files-table']")
+    EMPTY_FILES_STATE: Locator = (
+        By.CSS_SELECTOR,
+        "[data-testid='empty-files-state']",
+    )
+    AUDIT_LOG_NAV_LINK: Locator = (By.CSS_SELECTOR, "[data-testid='nav-audit-link']")
+    LOGOUT_BUTTON: Locator = (By.CSS_SELECTOR, "[data-testid='logout-button']")
 
     def is_loaded(self) -> bool:
         """
@@ -37,3 +63,28 @@ class DashboardPage(BasePage):
             and headings[0].is_displayed()
             and storage_panels[0].is_displayed()
         )
+
+    def upload_file(self, file_path: str) -> None:
+        """
+        Upload a file through the dashboard upload form.
+        """
+        self.driver.find_element(*self.UPLOAD_INPUT).send_keys(file_path)
+        self.driver.find_element(*self.UPLOAD_SUBMIT_BUTTON).click()
+
+    def click_audit_log_nav(self) -> "AuditLogPage":
+        """
+        Open the audit log page from the top navigation.
+        """
+        from tests.pages.audit_records.audit_log_page import AuditLogPage
+
+        self.driver.find_element(*self.AUDIT_LOG_NAV_LINK).click()
+        return AuditLogPage(self.driver)
+
+    def click_logout(self) -> "LoginPage":
+        """
+        Log out from the dashboard and return the login page object.
+        """
+        from tests.pages.login.login_page import LoginPage
+
+        self.driver.find_element(*self.LOGOUT_BUTTON).click()
+        return LoginPage(self.driver)
