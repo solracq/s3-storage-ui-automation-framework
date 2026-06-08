@@ -1,4 +1,6 @@
-"""Shared pytest fixtures for Secure S3 File Portal UI automation."""
+"""
+Shared pytest fixtures for Secure S3 File Portal UI automation.
+"""
 
 from __future__ import annotations
 
