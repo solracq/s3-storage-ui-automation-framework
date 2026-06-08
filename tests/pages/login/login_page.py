@@ -34,6 +34,9 @@ class LoginPage(BasePage):
     def login_as(self, username: str, password: str) -> None:
         """
         Sign in through the login form using the provided credentials.
+        Args:
+            username {str}: user's username
+            password {str}: user's password
         """
         username_input = self.driver.find_element(*self.USERNAME_INPUT)
         password_input = self.driver.find_element(*self.PASSWORD_INPUT)
@@ -46,13 +49,14 @@ class LoginPage(BasePage):
 
         self.driver.find_element(*self.SUBMIT_BUTTON).click()
 
-    def login_as_expected_success(
-        self,
-        username: str,
-        password: str,
-    ) -> DashboardPage:
+    def login_as_expected_success(self, username: str, password: str) -> DashboardPage:
         """
         Sign in through the login form and return the dashboard page object.
+        Args:
+            username {str}: user's username
+            password {str}: user's password
+        Returns:
+            DashboardPage: upon successful login, retrun of the dashoboard page.
         """
         self.login_as(username, password)
         return DashboardPage(self.driver)
