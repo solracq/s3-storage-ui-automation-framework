@@ -7,13 +7,22 @@ from __future__ import annotations
 import pytest
 
 from tests.pages.login.login_page import LoginPage
-from tests.variables import ADMIN_PASSWORD, ADMIN_ROLE, ADMIN_USERNAME
+from tests.variables import (
+    ADMIN_PASSWORD,
+    ADMIN_ROLE,
+    ADMIN_USERNAME,
+    STORAGE_STATUS_CONNECTED,
+)
 
 
 @pytest.mark.smoke
 def test_admin_can_sign_in_and_reach_dashboard(driver, base_url: str) -> None:
     """
     Verify the admin demo user can sign in and reach the dashboard.
+
+    Args:
+        driver: Selenium WebDriver fixture used to automate the browser.
+        base_url: Base portal URL used to open the application under test.
     """
     driver.get(base_url)
 
@@ -37,8 +46,8 @@ def test_admin_can_sign_in_and_reach_dashboard(driver, base_url: str) -> None:
     assert dashboard_page.get_current_role_text() == ADMIN_ROLE, (
         f"Expected dashboard current role to be '{ADMIN_ROLE}'."
     )
-    assert dashboard_page.get_storage_status_text() == "Connected", (
-        "Expected dashboard storage status to show 'Connected'."
+    assert dashboard_page.get_storage_status_text() == STORAGE_STATUS_CONNECTED, (
+        f"Expected dashboard storage status to show '{STORAGE_STATUS_CONNECTED}'."
     )
     assert dashboard_page.is_upload_panel_visible() is True, (
         "Expected the admin upload panel to be visible on the dashboard."
