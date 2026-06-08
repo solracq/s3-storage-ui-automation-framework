@@ -22,6 +22,7 @@ class LoginPage(BasePage):
     PAGE_ROOT: Locator = (By.CSS_SELECTOR, "[data-testid='login-page']")
     PAGE_HEADING: Locator = (By.CSS_SELECTOR, "[data-testid='login-heading']")
     PAGE_DESCRIPTION: Locator = (By.CSS_SELECTOR, "[data-testid='login-description']")
+    LOGIN_NAV_LINK: Locator = (By.CSS_SELECTOR, "[data-testid='login-nav-link']")
     LOGIN_FORM: Locator = (By.CSS_SELECTOR, "[data-testid='login-form']")
     USERNAME_INPUT: Locator = (By.CSS_SELECTOR, "[data-testid='username-input']")
     PASSWORD_INPUT: Locator = (By.CSS_SELECTOR, "[data-testid='password-input']")
@@ -43,3 +44,9 @@ class LoginPage(BasePage):
         password_input.send_keys(password)
 
         self.driver.find_element(*self.SUBMIT_BUTTON).click()
+
+    def click_login_nav_link(self) -> None:
+        """
+        Click the top-right Login navigation link.
+        """
+        self.driver.find_element(*self.LOGIN_NAV_LINK).click()
