@@ -72,11 +72,37 @@ class DashboardPage(BasePage):
         """
         return self.driver.find_element(*self.STORAGE_STATUS).text.strip()
 
+    def get_flash_message_text(self) -> str:
+        """
+        Helper: return the visible dashboard flash message text.
+        """
+        return self.driver.find_element(*self.FLASH_MESSAGE).text.strip()
+
+    def get_current_user_text(self) -> str:
+        """
+        Helper: return the signed-in user shown in the dashboard.
+        """
+        return self.driver.find_element(*self.CURRENT_PORTAL_USER).text.strip()
+
     def get_current_role_text(self) -> str:
         """
         Helper: return the signed-in user's role shown in the dashboard.
         """
         return self.driver.find_element(*self.CURRENT_PORTAL_ROLE).text.strip()
+
+    def is_upload_panel_visible(self) -> bool:
+        """
+        Helper: return whether the upload panel is currently displayed.
+        """
+        upload_panels = self.driver.find_elements(*self.UPLOAD_PANEL)
+        return bool(upload_panels) and upload_panels[0].is_displayed()
+
+    def is_viewer_role_panel_visible(self) -> bool:
+        """
+        Helper: return whether the viewer role panel is currently displayed.
+        """
+        viewer_panels = self.driver.find_elements(*self.VIEWER_ROLE_PANEL)
+        return bool(viewer_panels) and viewer_panels[0].is_displayed()
 
     def has_files_table(self) -> bool:
         """
