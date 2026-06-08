@@ -31,6 +31,8 @@ class LoginPage(BasePage):
     FLASH_MESSAGE: Locator = (By.CSS_SELECTOR, "[data-testid='login-flash-message']")
     DEMO_CREDENTIALS: Locator = (By.CSS_SELECTOR, "[data-testid='demo-credentials']")
 
+    # ### Action Methods ###
+
     def login_as(self, username: str, password: str) -> None:
         """
         Sign in through the login form using the provided credentials.
@@ -68,7 +70,7 @@ class LoginPage(BasePage):
             username {str}: user's username
             password {str}: user's password
         Returns:
-            LoginPage: upon unsuccessful login, return the same login page.
+            LoginPage: upon unsuccessful    login, return the same login page.
         """
         self.login_as(username, password)
         return self
@@ -85,22 +87,24 @@ class LoginPage(BasePage):
         """
         self.driver.find_element(*self.SUBMIT_BUTTON).click()
 
+    # ### Helper Methods ###
+
     def clear_form(self) -> None:
         """
-        Clear the username and password fields.
+        Helper: clear the username and password fields.
         """
         self.driver.find_element(*self.USERNAME_INPUT).clear()
         self.driver.find_element(*self.PASSWORD_INPUT).clear()
 
     def get_flash_message_text(self) -> str:
         """
-        Return the visible login flash message text.
+        Helper: return the visible login flash message text.
         """
         return self.driver.find_element(*self.FLASH_MESSAGE).text.strip()
 
     def is_loaded(self) -> bool:
         """
-        Return whether the main login page elements are present and visible.
+        Helper: return whether the main login page elements are present and visible.
         """
         page_roots = self.driver.find_elements(*self.PAGE_ROOT)
         headings = self.driver.find_elements(*self.PAGE_HEADING)
