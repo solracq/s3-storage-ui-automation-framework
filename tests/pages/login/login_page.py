@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from selenium.webdriver.common.by import By
 
+from tests.pages.dashboard.dashboard_page import DashboardPage
 from tests.pages.base_page import BasePage
 
 Locator = tuple[str, str]
@@ -45,8 +46,33 @@ class LoginPage(BasePage):
 
         self.driver.find_element(*self.SUBMIT_BUTTON).click()
 
+
     def click_login_nav_link(self) -> None:
         """
         Click the top-right Login navigation link.
         """
         self.driver.find_element(*self.LOGIN_NAV_LINK).click()
+
+    def submit_login(self) -> None:
+        """
+        Click the sign-in button without filling the login fields first.
+        """
+        self.driver.find_element(*self.SUBMIT_BUTTON).click()
+
+    def get_flash_message_text(self) -> str:
+        """
+        Return the visible login flash message text.
+        """
+        return self.driver.find_element(*self.FLASH_MESSAGE).text.strip()
+
+    def is_loaded(self) -> bool:
+        """
+        Return whether the main login page elements are present and visible.
+        """
+        page_roots = self.driver.find_elements(*self.PAGE_ROOT)
+        headings = self.driver.find_elements(*self.PAGE_HEADING)
+
+        if not page_roots or not headings:
+            return False
+
+        return page_roots[0].is_displayed() and headings[0].is_displayed()
