@@ -47,9 +47,11 @@ class DashboardPage(BasePage):
     AUDIT_LOG_NAV_LINK: Locator = (By.CSS_SELECTOR, "[data-testid='nav-audit-link']")
     LOGOUT_BUTTON: Locator = (By.CSS_SELECTOR, "[data-testid='logout-button']")
 
+    # ### Helper Methods ###
+
     def is_loaded(self) -> bool:
         """
-        Return whether the main dashboard elements are present and visible.
+        Helper: return whether the main dashboard elements are present and visible.
         """
         page_hero = self.driver.find_elements(*self.PAGE_HERO)
         headings = self.driver.find_elements(*self.PAGE_HEADING)
@@ -63,6 +65,34 @@ class DashboardPage(BasePage):
             and headings[0].is_displayed()
             and storage_panels[0].is_displayed()
         )
+
+    def get_storage_status_text(self) -> str:
+        """
+        Helper: return the storage status text shown in the dashboard.
+        """
+        return self.driver.find_element(*self.STORAGE_STATUS).text.strip()
+
+    def get_current_role_text(self) -> str:
+        """
+        Helper: return the signed-in user's role shown in the dashboard.
+        """
+        return self.driver.find_element(*self.CURRENT_PORTAL_ROLE).text.strip()
+
+    def has_files_table(self) -> bool:
+        """
+        Helper: return whether the files table is currently displayed.
+        """
+        tables = self.driver.find_elements(*self.FILES_TABLE)
+        return bool(tables) and tables[0].is_displayed()
+
+    def is_empty_state_visible(self) -> bool:
+        """
+        Helper: return whether the empty-files state is currently displayed.
+        """
+        empty_states = self.driver.find_elements(*self.EMPTY_FILES_STATE)
+        return bool(empty_states) and empty_states[0].is_displayed()
+
+    # ### Action Methods ###
 
     def upload_file(self, file_path: str) -> None:
         """
