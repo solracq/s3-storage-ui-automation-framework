@@ -46,6 +46,16 @@ class LoginPage(BasePage):
 
         self.driver.find_element(*self.SUBMIT_BUTTON).click()
 
+    def login_as_expected_success(
+        self,
+        username: str,
+        password: str,
+    ) -> DashboardPage:
+        """
+        Sign in through the login form and return the dashboard page object.
+        """
+        self.login_as(username, password)
+        return DashboardPage(self.driver)
 
     def click_login_nav_link(self) -> None:
         """
