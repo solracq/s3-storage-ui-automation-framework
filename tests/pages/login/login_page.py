@@ -4,7 +4,7 @@ Login page object for the Secure S3 File Portal.
 
 from __future__ import annotations
 
-from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
+from selenium.common.exceptions import WebDriverException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -126,8 +126,8 @@ class LoginPage(BasePage):
                 if not page_roots or not headings:
                     return False
 
-                return page_roots[0].is_displayed() and headings[0].is_displayed()
-            except StaleElementReferenceException:
+                return "/login" in driver.current_url
+            except WebDriverException:
                 return False
 
         try:

@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
@@ -150,10 +151,26 @@ class DashboardPage(BasePage):
         """
         Helper: wait until the dashboard flash message matches the expected text.
         """
-        WebDriverWait(self.driver, timeout_seconds).until(
-            lambda driver: driver.find_elements(*self.FLASH_MESSAGE)
-            and driver.find_element(*self.FLASH_MESSAGE).text.strip() == expected_text
-        )
+        def _dashboard_flash_message_matches(driver) -> bool:
+            try:
+                flash_messages = driver.find_elements(*self.FLASH_MESSAGE)
+                if not flash_messages:
+                    return False
+
+                return driver.find_element(*self.FLASH_MESSAGE).text.strip() == expected_text
+            except StaleElementReferenceException:
+                return False
+
+        try:
+            WebDriverWait(self.driver, timeout_seconds).until(
+                _dashboard_flash_message_matches
+            )
+        except TimeoutException as exc:
+            raise AssertionError(
+                f"Expected dashboard flash message to become '{expected_text}' within "
+                f"{timeout_seconds} seconds."
+            ) from exc
+
         return self.get_flash_message_text()
 
     def get_current_user_text(self) -> str:

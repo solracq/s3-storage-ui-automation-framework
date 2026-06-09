@@ -193,7 +193,10 @@ def test_admin_can_upload_file_by_selecting_it(driver, base_url: str, reset_port
 
     dashboard_page.submit_upload()
 
-    assert dashboard_page.get_flash_message_text() == UPLOAD_SUCCESS_MESSAGE, (
+    assert (
+        dashboard_page.wait_for_flash_message_text(UPLOAD_SUCCESS_MESSAGE)
+        == UPLOAD_SUCCESS_MESSAGE
+    ), (
         f"Expected upload success message to be '{UPLOAD_SUCCESS_MESSAGE}'."
     )
     assert dashboard_page.has_files_table() is True, (
@@ -257,7 +260,10 @@ def test_admin_can_upload_file_by_dragging_it(driver, base_url: str, reset_porta
 
     dashboard_page.submit_upload()
 
-    assert dashboard_page.get_flash_message_text() == UPLOAD_SUCCESS_MESSAGE, (
+    assert (
+        dashboard_page.wait_for_flash_message_text(UPLOAD_SUCCESS_MESSAGE)
+        == UPLOAD_SUCCESS_MESSAGE
+    ), (
         f"Expected drag-and-drop upload success message to be '{UPLOAD_SUCCESS_MESSAGE}'."
     )
     assert dashboard_page.contains_file_name(PNG_FILE_NAME) is True, (
