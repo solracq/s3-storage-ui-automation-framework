@@ -90,12 +90,7 @@ def _sign_in_as_viewer(driver, base_url: str) -> DashboardPage:
     return dashboard_page
 
 
-def _wait_for_download(
-    download_directory: Path,
-    expected_filename: str,
-    *,
-    timeout_seconds: int = 10,
-) -> Path:
+def _wait_for_download(download_directory: Path, expected_filename: str, *, timeout_seconds: int = 10) -> Path:
     """
     Wait until the expected downloaded file appears in the browser download folder.
 
@@ -173,12 +168,7 @@ def test_portal_health_endpoint_reports_ready_status(base_url: str) -> None:
 
 
 @pytest.mark.smoke
-def test_admin_can_upload_file_by_selecting_it(
-    driver,
-    base_url: str,
-    reset_portal_state,
-    storage_service,
-) -> None:
+def test_admin_can_upload_file_by_selecting_it(driver, base_url: str, reset_portal_state, storage_service) -> None:
     """
     Verify the admin user can upload a file by selecting it from the upload input.
 
@@ -246,12 +236,7 @@ def test_admin_can_upload_file_by_selecting_it(
 
 
 @pytest.mark.smoke
-def test_admin_can_upload_file_by_dragging_it(
-    driver,
-    base_url: str,
-    reset_portal_state,
-    storage_service,
-) -> None:
+def test_admin_can_upload_file_by_dragging_it(driver, base_url: str, reset_portal_state, storage_service) -> None:
     """
     Verify the admin user can upload a file by dragging it into the upload area.
 
@@ -292,12 +277,7 @@ def test_admin_can_upload_file_by_dragging_it(
 
 
 @pytest.mark.smoke
-def test_authenticated_user_can_download_existing_file(
-    driver,
-    base_url: str,
-    download_directory: Path,
-    reset_portal_state,
-) -> None:
+def test_authenticated_user_can_download_existing_file(driver, base_url: str, download_directory: Path, reset_portal_state) -> None:
     """
     Verify an authenticated user can download an existing uploaded file.
 
@@ -311,10 +291,7 @@ def test_authenticated_user_can_download_existing_file(
     admin_dashboard_page = _sign_in_as_admin(driver, base_url)
     admin_dashboard_page.upload_file(str(SMALL_TEXT_FILE_PATH))
 
-    assert (
-        admin_dashboard_page.wait_for_flash_message_text(UPLOAD_SUCCESS_MESSAGE)
-        == UPLOAD_SUCCESS_MESSAGE
-    ), (
+    assert admin_dashboard_page.wait_for_flash_message_text(UPLOAD_SUCCESS_MESSAGE) == UPLOAD_SUCCESS_MESSAGE, (
         f"Expected setup upload success message to be '{UPLOAD_SUCCESS_MESSAGE}'."
     )
 
@@ -342,12 +319,7 @@ def test_authenticated_user_can_download_existing_file(
 
 
 @pytest.mark.smoke
-def test_admin_can_delete_existing_file(
-    driver,
-    base_url: str,
-    reset_portal_state,
-    storage_service,
-) -> None:
+def test_admin_can_delete_existing_file(driver, base_url: str, reset_portal_state, storage_service) -> None:
     """
     Verify the admin user can delete an existing uploaded file.
 
@@ -361,10 +333,7 @@ def test_admin_can_delete_existing_file(
     dashboard_page = _sign_in_as_admin(driver, base_url)
     dashboard_page.upload_file(str(SMALL_TEXT_FILE_PATH))
 
-    assert (
-        dashboard_page.wait_for_flash_message_text(UPLOAD_SUCCESS_MESSAGE)
-        == UPLOAD_SUCCESS_MESSAGE
-    ), (
+    assert dashboard_page.wait_for_flash_message_text(UPLOAD_SUCCESS_MESSAGE) == UPLOAD_SUCCESS_MESSAGE, (
         f"Expected setup upload success message to be '{UPLOAD_SUCCESS_MESSAGE}'."
     )
     assert dashboard_page.contains_file_name(SMALL_TEXT_FILE_NAME) is True, (
@@ -373,10 +342,7 @@ def test_admin_can_delete_existing_file(
 
     dashboard_page.click_delete_file_by_name(SMALL_TEXT_FILE_NAME)
 
-    assert (
-        dashboard_page.wait_for_flash_message_text(DELETE_SUCCESS_MESSAGE)
-        == DELETE_SUCCESS_MESSAGE
-    ), (
+    assert dashboard_page.wait_for_flash_message_text(DELETE_SUCCESS_MESSAGE) == DELETE_SUCCESS_MESSAGE, (
         f"Expected delete success message to be '{DELETE_SUCCESS_MESSAGE}'."
     )
     assert dashboard_page.wait_until_file_name_not_visible(SMALL_TEXT_FILE_NAME) is True, (
