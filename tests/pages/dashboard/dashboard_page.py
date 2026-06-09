@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.ui import WebDriverWait
 
 from tests.pages.base_page import BasePage
 
@@ -108,6 +109,20 @@ class DashboardPage(BasePage):
         """
         return self.driver.find_element(*self.FLASH_MESSAGE).text.strip()
 
+    def wait_for_flash_message_text(
+        self,
+        expected_text: str,
+        timeout_seconds: int = 10,
+    ) -> str:
+        """
+        Helper: wait until the dashboard flash message matches the expected text.
+        """
+        WebDriverWait(self.driver, timeout_seconds).until(
+            lambda driver: driver.find_elements(*self.FLASH_MESSAGE)
+            and driver.find_element(*self.FLASH_MESSAGE).text.strip() == expected_text
+        )
+        return self.get_flash_message_text()
+
     def get_current_user_text(self) -> str:
         """
         Helper: return the signed-in user shown in the dashboard.
@@ -161,6 +176,32 @@ class DashboardPage(BasePage):
         Helper: return whether the dashboard currently shows the given file name.
         """
         return filename in self.get_visible_file_names()
+
+    def wait_until_file_name_visible(
+        self,
+        filename: str,
+        timeout_seconds: int = 10,
+    ) -> bool:
+        """
+        Helper: wait until the dashboard shows the given file name.
+        """
+        WebDriverWait(self.driver, timeout_seconds).until(
+            lambda _driver: self.contains_file_name(filename)
+        )
+        return self.contains_file_name(filename)
+
+    def wait_until_file_name_not_visible(
+        self,
+        filename: str,
+        timeout_seconds: int = 10,
+    ) -> bool:
+        """
+        Helper: wait until the dashboard no longer shows the given file name.
+        """
+        WebDriverWait(self.driver, timeout_seconds).until(
+            lambda _driver: not self.contains_file_name(filename)
+        )
+        return self.contains_file_name(filename) is False
 
     def get_selected_upload_file_name(self) -> str:
         """
@@ -286,14 +327,16 @@ class DashboardPage(BasePage):
         Download the selected file from the dashboard table.
         """
         row = self._find_file_row_by_name(filename)
-        row.find_element(*self.DOWNLOAD_FILE_BUTTON).click()
+        download_button = row.find_element(*self.DOWNLOAD_FILE_BUTTON)
+        self.driver.execute_script("arguments[0].click();", download_button)
 
     def click_delete_file_by_name(self, filename: str) -> None:
         """
         Delete the selected file from the dashboard table.
         """
         row = self._find_file_row_by_name(filename)
-        row.find_element(*self.DELETE_FILE_BUTTON).click()
+        delete_button = row.find_element(*self.DELETE_FILE_BUTTON)
+        self.driver.execute_script("arguments[0].click();", delete_button)
 
     def click_audit_log_nav(self) -> AuditLogPage:
         """

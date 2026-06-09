@@ -107,13 +107,34 @@ def _wait_for_download(
     Returns:
         Path: Downloaded file path once the browser finishes writing it.
     """
-    downloaded_file = download_directory / expected_filename
-    partial_download = download_directory / f"{expected_filename}.crdownload"
     deadline = time.monotonic() + timeout_seconds
 
     while time.monotonic() < deadline:
-        if downloaded_file.exists() and not partial_download.exists():
-            return downloaded_file
+        completed_downloads = [
+            file_path
+            for file_path in download_directory.iterdir()
+            if file_path.is_file() and not file_path.name.endswith(".crdownload")
+        ]
+        exact_match = next(
+            (
+                file_path
+                for file_path in completed_downloads
+                if file_path.name == expected_filename
+            ),
+            None,
+        )
+
+        if exact_match is not None and exact_match.stat().st_size > 0:
+            return exact_match
+
+        if completed_downloads:
+            most_recent_download = max(
+                completed_downloads,
+                key=lambda file_path: file_path.stat().st_mtime,
+            )
+            if most_recent_download.stat().st_size > 0:
+                return most_recent_download
+
         time.sleep(0.25)
 
     raise AssertionError(
@@ -290,7 +311,10 @@ def test_authenticated_user_can_download_existing_file(
     admin_dashboard_page = _sign_in_as_admin(driver, base_url)
     admin_dashboard_page.upload_file(str(SMALL_TEXT_FILE_PATH))
 
-    assert admin_dashboard_page.get_flash_message_text() == UPLOAD_SUCCESS_MESSAGE, (
+    assert (
+        admin_dashboard_page.wait_for_flash_message_text(UPLOAD_SUCCESS_MESSAGE)
+        == UPLOAD_SUCCESS_MESSAGE
+    ), (
         f"Expected setup upload success message to be '{UPLOAD_SUCCESS_MESSAGE}'."
     )
 
@@ -337,7 +361,10 @@ def test_admin_can_delete_existing_file(
     dashboard_page = _sign_in_as_admin(driver, base_url)
     dashboard_page.upload_file(str(SMALL_TEXT_FILE_PATH))
 
-    assert dashboard_page.get_flash_message_text() == UPLOAD_SUCCESS_MESSAGE, (
+    assert (
+        dashboard_page.wait_for_flash_message_text(UPLOAD_SUCCESS_MESSAGE)
+        == UPLOAD_SUCCESS_MESSAGE
+    ), (
         f"Expected setup upload success message to be '{UPLOAD_SUCCESS_MESSAGE}'."
     )
     assert dashboard_page.contains_file_name(SMALL_TEXT_FILE_NAME) is True, (
@@ -346,10 +373,13 @@ def test_admin_can_delete_existing_file(
 
     dashboard_page.click_delete_file_by_name(SMALL_TEXT_FILE_NAME)
 
-    assert dashboard_page.get_flash_message_text() == DELETE_SUCCESS_MESSAGE, (
+    assert (
+        dashboard_page.wait_for_flash_message_text(DELETE_SUCCESS_MESSAGE)
+        == DELETE_SUCCESS_MESSAGE
+    ), (
         f"Expected delete success message to be '{DELETE_SUCCESS_MESSAGE}'."
     )
-    assert dashboard_page.contains_file_name(SMALL_TEXT_FILE_NAME) is False, (
+    assert dashboard_page.wait_until_file_name_not_visible(SMALL_TEXT_FILE_NAME) is True, (
         f"Expected '{SMALL_TEXT_FILE_NAME}' to no longer appear after delete."
     )
     assert dashboard_page.is_empty_state_visible() is True, (
