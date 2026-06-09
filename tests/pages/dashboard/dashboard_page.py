@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 
 from tests.pages.base_page import BasePage
 
@@ -43,9 +45,25 @@ class DashboardPage(BasePage):
         By.CSS_SELECTOR,
         "[data-testid='upload-submit-button']",
     )
+    UPLOAD_LIMIT_NOTE: Locator = (By.CSS_SELECTOR, "[data-testid='upload-limit-note']")
     VIEWER_ROLE_PANEL: Locator = (By.CSS_SELECTOR, "[data-testid='viewer-role-panel']")
     FILES_PANEL: Locator = (By.CSS_SELECTOR, "[data-testid='files-panel']")
     FILES_TABLE: Locator = (By.CSS_SELECTOR, "[data-testid='files-table']")
+    FILE_ROWS: Locator = (By.CSS_SELECTOR, "[data-testid='file-row']")
+    FILE_NAME: Locator = (By.CSS_SELECTOR, "[data-testid='file-name']")
+    FILE_OBJECT_KEY: Locator = (By.CSS_SELECTOR, "[data-testid='file-object-key']")
+    FILE_UPLOADED_BY: Locator = (By.CSS_SELECTOR, "[data-testid='file-uploaded-by']")
+    FILE_CONTENT_TYPE: Locator = (By.CSS_SELECTOR, "[data-testid='file-content-type']")
+    FILE_UPLOADED_AT: Locator = (By.CSS_SELECTOR, "[data-testid='file-uploaded-at']")
+    FILE_SIZE: Locator = (By.CSS_SELECTOR, "[data-testid='file-size']")
+    DOWNLOAD_FILE_BUTTON: Locator = (
+        By.CSS_SELECTOR,
+        "[data-testid='download-file-button']",
+    )
+    DELETE_FILE_BUTTON: Locator = (
+        By.CSS_SELECTOR,
+        "[data-testid='delete-file-button']",
+    )
     EMPTY_FILES_STATE: Locator = (
         By.CSS_SELECTOR,
         "[data-testid='empty-files-state']",
@@ -77,6 +95,12 @@ class DashboardPage(BasePage):
         Helper: return the storage status text shown in the dashboard.
         """
         return self.driver.find_element(*self.STORAGE_STATUS).text.strip()
+
+    def get_upload_limit_note_text(self) -> str:
+        """
+        Helper: return the upload size note shown in the admin upload panel.
+        """
+        return self.driver.find_element(*self.UPLOAD_LIMIT_NOTE).text.strip()
 
     def get_flash_message_text(self) -> str:
         """
@@ -117,6 +141,49 @@ class DashboardPage(BasePage):
         tables = self.driver.find_elements(*self.FILES_TABLE)
         return bool(tables) and tables[0].is_displayed()
 
+    def get_file_row_count(self) -> int:
+        """
+        Helper: return the number of visible file rows in the dashboard table.
+        """
+        return len(self.driver.find_elements(*self.FILE_ROWS))
+
+    def get_visible_file_names(self) -> list[str]:
+        """
+        Helper: return the visible uploaded file names in table order.
+        """
+        return [
+            element.text.strip()
+            for element in self.driver.find_elements(*self.FILE_NAME)
+        ]
+
+    def contains_file_name(self, filename: str) -> bool:
+        """
+        Helper: return whether the dashboard currently shows the given file name.
+        """
+        return filename in self.get_visible_file_names()
+
+    def get_selected_upload_file_name(self) -> str:
+        """
+        Helper: return the currently selected file name from the upload input.
+        """
+        raw_value = self.driver.find_element(*self.UPLOAD_INPUT).get_attribute("value")
+        normalized_value = (raw_value or "").replace("\\", "/")
+        return normalized_value.rsplit("/", maxsplit=1)[-1]
+
+    def get_file_metadata_by_name(self, filename: str) -> dict[str, str]:
+        """
+        Helper: return the visible metadata for one uploaded file row.
+        """
+        row = self._find_file_row_by_name(filename)
+        return {
+            "filename": row.find_element(*self.FILE_NAME).text.strip(),
+            "object_key": row.find_element(*self.FILE_OBJECT_KEY).text.strip(),
+            "uploaded_by": row.find_element(*self.FILE_UPLOADED_BY).text.strip(),
+            "content_type": row.find_element(*self.FILE_CONTENT_TYPE).text.strip(),
+            "uploaded_at": row.find_element(*self.FILE_UPLOADED_AT).text.strip(),
+            "size": row.find_element(*self.FILE_SIZE).text.strip(),
+        }
+
     def is_empty_state_visible(self) -> bool:
         """
         Helper: return whether the empty-files state is currently displayed.
@@ -124,14 +191,109 @@ class DashboardPage(BasePage):
         empty_states = self.driver.find_elements(*self.EMPTY_FILES_STATE)
         return bool(empty_states) and empty_states[0].is_displayed()
 
+    def _find_file_row_by_name(self, filename: str) -> WebElement:
+        """
+        Helper: return the file table row whose file-name cell matches the input.
+        """
+        for row in self.driver.find_elements(*self.FILE_ROWS):
+            row_file_name = row.find_element(*self.FILE_NAME).text.strip()
+            if row_file_name == filename:
+                return row
+
+        raise ValueError(f"Could not find a file row for '{filename}'.")
+
     # ### Action Methods ###
+
+    def select_file_for_upload(self, file_path: str) -> None:
+        """
+        Select a local file in the dashboard upload input without submitting it.
+        """
+        self.driver.find_element(*self.UPLOAD_INPUT).send_keys(file_path)
+
+    def submit_upload(self) -> None:
+        """
+        Submit the current dashboard upload form selection.
+        """
+        self.driver.find_element(*self.UPLOAD_SUBMIT_BUTTON).click()
 
     def upload_file(self, file_path: str) -> None:
         """
         Upload a file through the dashboard upload form.
         """
-        self.driver.find_element(*self.UPLOAD_INPUT).send_keys(file_path)
-        self.driver.find_element(*self.UPLOAD_SUBMIT_BUTTON).click()
+        self.select_file_for_upload(file_path)
+        self.submit_upload()
+
+    def drag_file_into_upload_input(self, file_path: str) -> None:
+        """
+        Simulate dragging a local file into the upload input without submitting it.
+        """
+        upload_input = self.driver.find_element(*self.UPLOAD_INPUT)
+
+        self.driver.execute_script(
+            """
+            const existingInput = document.getElementById("__selenium_drag_source__");
+            if (existingInput) {
+                existingInput.remove();
+            }
+
+            const tempInput = document.createElement("input");
+            tempInput.type = "file";
+            tempInput.id = "__selenium_drag_source__";
+            tempInput.style.position = "fixed";
+            tempInput.style.left = "-9999px";
+            document.body.appendChild(tempInput);
+            """
+        )
+        temp_input = self.driver.find_element(By.ID, "__selenium_drag_source__")
+        temp_input.send_keys(str(Path(file_path).resolve()))
+
+        self.driver.execute_script(
+            """
+            const sourceInput = document.getElementById("__selenium_drag_source__");
+            const targetInput = arguments[0];
+            const dataTransfer = new DataTransfer();
+
+            for (const file of sourceInput.files) {
+                dataTransfer.items.add(file);
+            }
+
+            targetInput.files = dataTransfer.files;
+            targetInput.dispatchEvent(new Event("input", { bubbles: true }));
+            targetInput.dispatchEvent(new Event("change", { bubbles: true }));
+            targetInput.dispatchEvent(
+                new DragEvent("dragenter", { bubbles: true, dataTransfer })
+            );
+            targetInput.dispatchEvent(
+                new DragEvent("dragover", { bubbles: true, dataTransfer })
+            );
+            targetInput.dispatchEvent(
+                new DragEvent("drop", { bubbles: true, dataTransfer })
+            );
+            sourceInput.remove();
+            """,
+            upload_input,
+        )
+
+    def upload_file_by_drag_and_drop(self, file_path: str) -> None:
+        """
+        Simulate dragging a local file into the upload input, then submit it.
+        """
+        self.drag_file_into_upload_input(file_path)
+        self.submit_upload()
+
+    def click_download_file_by_name(self, filename: str) -> None:
+        """
+        Download the selected file from the dashboard table.
+        """
+        row = self._find_file_row_by_name(filename)
+        row.find_element(*self.DOWNLOAD_FILE_BUTTON).click()
+
+    def click_delete_file_by_name(self, filename: str) -> None:
+        """
+        Delete the selected file from the dashboard table.
+        """
+        row = self._find_file_row_by_name(filename)
+        row.find_element(*self.DELETE_FILE_BUTTON).click()
 
     def click_audit_log_nav(self) -> AuditLogPage:
         """
