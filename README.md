@@ -21,11 +21,13 @@ Implemented now:
 * Docker Compose setup for the portal and MinIO
 * `/health` endpoint for basic runtime diagnostics
 * Graceful degraded startup when MinIO is unavailable
+* Initial Selenium Page Object Model structure
+* Initial smoke test coverage with `pytest` and Selenium WebDriver
 
 Not implemented yet:
 
-* Selenium automation framework
-* Smoke, regression, and negative test suites
+* Broader regression and negative automated test suites
+* CI execution for UI automation
 
 ## Planned Roadmap
 
@@ -72,6 +74,27 @@ uvicorn app.storage_portal.main:app --reload
 
 **Note:**
 If MinIO is not running, the app still starts, but the dashboard and `/health` endpoint will show storage as unavailable.
+
+## Local Smoke Test Run
+
+To run the current Selenium smoke tests locally, first make sure the portal stack is already running at `http://localhost:8000`.
+
+If you have not created the local virtual environment yet:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-test.txt
+```
+
+Then run the current happy-path smoke suite with:
+
+```bash
+.venv/bin/python -m pytest tests/smoke/test_positive_file_workflows_smoke.py -m smoke -vv -s
+```
+
+**Note:**
+Using `.venv/bin/python -m pytest` avoids issues where a globally installed `pytest` points to a different Python interpreter than the local project virtual environment.
 
 ## Utility Scripts
 
