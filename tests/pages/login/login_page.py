@@ -5,6 +5,7 @@ Login page object for the Secure S3 File Portal.
 from __future__ import annotations
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 
 from tests.pages.dashboard.dashboard_page import DashboardPage
 from tests.pages.base_page import BasePage
@@ -101,6 +102,16 @@ class LoginPage(BasePage):
         Helper: return the visible login flash message text.
         """
         return self.driver.find_element(*self.FLASH_MESSAGE).text.strip()
+
+    def wait_for_flash_message_text(self, expected_text: str, timeout_seconds: int = 10) -> str:
+        """
+        Helper: wait until the login flash message matches the expected text.
+        """
+        WebDriverWait(self.driver, timeout_seconds).until(
+            lambda driver: driver.find_elements(*self.FLASH_MESSAGE)
+            and driver.find_element(*self.FLASH_MESSAGE).text.strip() == expected_text
+        )
+        return self.get_flash_message_text()
 
     def is_loaded(self) -> bool:
         """
