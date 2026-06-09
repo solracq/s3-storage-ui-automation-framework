@@ -4,6 +4,7 @@ Login page object for the Secure S3 File Portal.
 
 from __future__ import annotations
 
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -113,14 +114,23 @@ class LoginPage(BasePage):
         )
         return self.get_flash_message_text()
 
-    def is_loaded(self) -> bool:
+    def is_loaded(self, timeout_seconds: int = 5) -> bool:
         """
         Helper: return whether the main login page elements are present and visible.
         """
-        page_roots = self.driver.find_elements(*self.PAGE_ROOT)
-        headings = self.driver.find_elements(*self.PAGE_HEADING)
+        def _login_page_is_ready(driver) -> bool:
+            try:
+                page_roots = driver.find_elements(*self.PAGE_ROOT)
+                headings = driver.find_elements(*self.PAGE_HEADING)
 
-        if not page_roots or not headings:
+                if not page_roots or not headings:
+                    return False
+
+                return page_roots[0].is_displayed() and headings[0].is_displayed()
+            except StaleElementReferenceException:
+                return False
+
+        try:
+            return bool(WebDriverWait(self.driver, timeout_seconds).until(_login_page_is_ready))
+        except TimeoutException:
             return False
-
-        return page_roots[0].is_displayed() and headings[0].is_displayed()
