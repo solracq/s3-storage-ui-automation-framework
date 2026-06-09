@@ -32,6 +32,9 @@ class DashboardPage(BasePage):
         "[data-testid='storage-status-panel']",
     )
     STORAGE_STATUS: Locator = (By.CSS_SELECTOR, "[data-testid='storage-status']")
+    BUCKET_NAME: Locator = (By.CSS_SELECTOR, "[data-testid='bucket-name']")
+    STORAGE_ENDPOINT: Locator = (By.CSS_SELECTOR, "[data-testid='storage-endpoint']")
+    PORTAL_MODE: Locator = (By.CSS_SELECTOR, "[data-testid='portal-mode']")
     CURRENT_PORTAL_USER: Locator = (
         By.CSS_SELECTOR,
         "[data-testid='current-portal-user']",
@@ -97,6 +100,36 @@ class DashboardPage(BasePage):
         """
         return self.driver.find_element(*self.STORAGE_STATUS).text.strip()
 
+    def get_page_heading_text(self) -> str:
+        """
+        Helper: return the dashboard page heading text.
+        """
+        return self.driver.find_element(*self.PAGE_HEADING).text.strip()
+
+    def get_page_description_text(self) -> str:
+        """
+        Helper: return the dashboard page description text.
+        """
+        return self.driver.find_element(*self.PAGE_DESCRIPTION).text.strip()
+
+    def get_bucket_name_text(self) -> str:
+        """
+        Helper: return the bucket name displayed in the dashboard.
+        """
+        return self.driver.find_element(*self.BUCKET_NAME).text.strip()
+
+    def get_storage_endpoint_text(self) -> str:
+        """
+        Helper: return the storage endpoint displayed in the dashboard.
+        """
+        return self.driver.find_element(*self.STORAGE_ENDPOINT).text.strip()
+
+    def get_portal_mode_text(self) -> str:
+        """
+        Helper: return the portal mode text displayed in the dashboard.
+        """
+        return self.driver.find_element(*self.PORTAL_MODE).text.strip()
+
     def get_upload_limit_note_text(self) -> str:
         """
         Helper: return the upload size note shown in the admin upload panel.
@@ -155,6 +188,20 @@ class DashboardPage(BasePage):
         """
         tables = self.driver.find_elements(*self.FILES_TABLE)
         return bool(tables) and tables[0].is_displayed()
+
+    def is_files_panel_visible(self) -> bool:
+        """
+        Helper: return whether the main files panel is currently displayed.
+        """
+        panels = self.driver.find_elements(*self.FILES_PANEL)
+        return bool(panels) and panels[0].is_displayed()
+
+    def is_upload_submit_button_enabled(self) -> bool:
+        """
+        Helper: return whether the upload submit button is enabled and visible.
+        """
+        buttons = self.driver.find_elements(*self.UPLOAD_SUBMIT_BUTTON)
+        return bool(buttons) and buttons[0].is_displayed() and buttons[0].is_enabled()
 
     def get_file_row_count(self) -> int:
         """
@@ -231,6 +278,12 @@ class DashboardPage(BasePage):
         """
         empty_states = self.driver.find_elements(*self.EMPTY_FILES_STATE)
         return bool(empty_states) and empty_states[0].is_displayed()
+
+    def get_empty_state_text(self) -> str:
+        """
+        Helper: return the visible empty-files state message.
+        """
+        return self.driver.find_element(*self.EMPTY_FILES_STATE).text.strip()
 
     def _find_file_row_by_name(self, filename: str) -> WebElement:
         """
