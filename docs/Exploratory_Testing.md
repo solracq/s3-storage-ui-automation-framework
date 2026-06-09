@@ -613,3 +613,36 @@ Access the `Secure S3 File Portal` and verify the following:
 3) The `Stored Files` section shows the `Download` action only.
 3) The `Delete` action is not displayed for the `viewer` role.
 3) The page text reflects the signed-in `viewer` user and the `viewer` role.
+
+#### Scenario 29: Attempt to access protected portal pages without authentication
+
+**Prerequisite**
+
+* No active portal session is present.
+
+1. Go directly to the Secure S3 File Portal root URL.
+2. Attempt to access the audit log URL directly without logging in.
+3. Verify that both protected routes redirect the user to the login page.
+
+**Output**
+
+2) The unauthenticated user is redirected to the login page.
+2) The message `Please sign in to access the portal.` is displayed when access is blocked.
+
+#### Scenario 30: Log out and verify that the session is invalidated
+
+**Prerequisite**
+
+* Sign in as `admin` or `viewer`.
+
+1. Go to the Secure S3 File Portal.
+2. Click the `Logout` button.
+3. Attempt to return to the dashboard by using the browser navigation or by entering the dashboard URL directly.
+4. Verify that the session no longer grants access to the protected portal pages.
+
+**Output**
+
+2) The user is returned to the login page.
+2) The message `Logged out successfully.` is displayed.
+3) The user is redirected to the login page instead of the dashboard.
+4) The session no longer grants access to the protected portal pages.
