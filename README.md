@@ -98,7 +98,7 @@ Then run the smoke suites with:
 Run all smoke tests
 ```bash
 .venv/bin/python -m pytest tests/smoke -m smoke -vv -s
-```bash
+```
 
 **Note:**
 Using `.venv/bin/python -m pytest` avoids issues where a globally installed `pytest` points to a different Python interpreter than the local project virtual environment.
