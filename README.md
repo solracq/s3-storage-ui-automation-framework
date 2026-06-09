@@ -87,11 +87,18 @@ source .venv/bin/activate
 pip install -r requirements-test.txt
 ```
 
-Then run the current happy-path smoke suite with:
+Then run the smoke suites with:
 
 ```bash
+.venv/bin/python -m pytest tests/smoke/test_admin_login_smoke.py -m smoke -vv -s
 .venv/bin/python -m pytest tests/smoke/test_positive_file_workflows_smoke.py -m smoke -vv -s
+.venv/bin/python -m pytest tests/smoke/test_curated_smoke_scenarios.py -m smoke -vv -s
 ```
+
+Run all smoke tests
+```bash
+.venv/bin/python -m pytest tests/smoke -m smoke -vv -s
+```bash
 
 **Note:**
 Using `.venv/bin/python -m pytest` avoids issues where a globally installed `pytest` points to a different Python interpreter than the local project virtual environment.
