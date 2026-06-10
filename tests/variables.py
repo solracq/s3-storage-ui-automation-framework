@@ -27,6 +27,7 @@ EMPTY_FILES_MESSAGE = (
     "No files are stored yet. Upload a sample object to verify the MinIO "
     "integration end to end."
 )
+VIEWER_ROLE_STATUS_TEXT = "Download-Only Access"
 INVALID_LOGIN_MESSAGE = "Invalid username or password."
 EMPTY_UPLOAD_MESSAGE = "Please choose a file before uploading."
 EMPTY_FILE_UPLOAD_MESSAGE = "Please upload a non-empty file."
@@ -50,3 +51,6 @@ LARGE_FILE_WITHIN_LIMIT_PATH = TEST_DATA_DIR / LARGE_FILE_WITHIN_LIMIT_NAME
 
 LARGE_FILE_EXCEEDS_LIMIT_NAME = "large-file-size-exeeded.txt"
 LARGE_FILE_EXCEEDS_LIMIT_PATH = TEST_DATA_DIR / LARGE_FILE_EXCEEDS_LIMIT_NAME
+
+TEXT_PLAIN_CONTENT_TYPE = "text/plain"
+PNG_CONTENT_TYPE = "image/png"
