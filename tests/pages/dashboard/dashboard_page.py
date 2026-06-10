@@ -5,7 +5,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
+from selenium.common.exceptions import (
+    StaleElementReferenceException,
+    TimeoutException,
+    WebDriverException,
+)
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
@@ -27,6 +31,15 @@ class DashboardPage(BasePage):
     PAGE_HERO: Locator = (By.CSS_SELECTOR, "[data-testid='portal-hero']")
     PAGE_HEADING: Locator = (By.CSS_SELECTOR, "[data-testid='page-heading']")
     PAGE_DESCRIPTION: Locator = (By.CSS_SELECTOR, "[data-testid='page-description']")
+    PORTAL_TOPBAR: Locator = (By.CSS_SELECTOR, "[data-testid='portal-topbar']")
+    DASHBOARD_NAV_LINK: Locator = (
+        By.CSS_SELECTOR,
+        "[data-testid='nav-dashboard-link']",
+    )
+    CURRENT_USER_BADGE: Locator = (
+        By.CSS_SELECTOR,
+        "[data-testid='current-user-badge']",
+    )
     FLASH_MESSAGE: Locator = (By.CSS_SELECTOR, "[data-testid='flash-message']")
     STORAGE_STATUS_PANEL: Locator = (
         By.CSS_SELECTOR,
@@ -52,6 +65,10 @@ class DashboardPage(BasePage):
     )
     UPLOAD_LIMIT_NOTE: Locator = (By.CSS_SELECTOR, "[data-testid='upload-limit-note']")
     VIEWER_ROLE_PANEL: Locator = (By.CSS_SELECTOR, "[data-testid='viewer-role-panel']")
+    VIEWER_ROLE_STATUS: Locator = (
+        By.CSS_SELECTOR,
+        "[data-testid='viewer-role-status']",
+    )
     FILES_PANEL: Locator = (By.CSS_SELECTOR, "[data-testid='files-panel']")
     FILES_TABLE: Locator = (By.CSS_SELECTOR, "[data-testid='files-table']")
     FILE_ROWS: Locator = (By.CSS_SELECTOR, "[data-testid='file-row']")
@@ -113,6 +130,47 @@ class DashboardPage(BasePage):
         """
         return self.driver.find_element(*self.PAGE_DESCRIPTION).text.strip()
 
+    def is_topbar_visible(self) -> bool:
+        """
+        Helper: return whether the shared portal top bar is visible.
+        """
+        topbars = self.driver.find_elements(*self.PORTAL_TOPBAR)
+        return bool(topbars) and topbars[0].is_displayed()
+
+    def is_dashboard_nav_visible(self) -> bool:
+        """
+        Helper: return whether the dashboard navigation link is visible.
+        """
+        dashboard_links = self.driver.find_elements(*self.DASHBOARD_NAV_LINK)
+        return bool(dashboard_links) and dashboard_links[0].is_displayed()
+
+    def is_audit_log_nav_visible(self) -> bool:
+        """
+        Helper: return whether the audit log navigation link is visible.
+        """
+        audit_links = self.driver.find_elements(*self.AUDIT_LOG_NAV_LINK)
+        return bool(audit_links) and audit_links[0].is_displayed()
+
+    def is_current_user_badge_visible(self) -> bool:
+        """
+        Helper: return whether the top-bar current-user badge is visible.
+        """
+        badges = self.driver.find_elements(*self.CURRENT_USER_BADGE)
+        return bool(badges) and badges[0].is_displayed()
+
+    def get_current_user_badge_text(self) -> str:
+        """
+        Helper: return the combined text shown inside the current-user badge.
+        """
+        return self.driver.find_element(*self.CURRENT_USER_BADGE).text.strip()
+
+    def is_logout_button_visible(self) -> bool:
+        """
+        Helper: return whether the logout button is visible.
+        """
+        buttons = self.driver.find_elements(*self.LOGOUT_BUTTON)
+        return bool(buttons) and buttons[0].is_displayed()
+
     def get_bucket_name_text(self) -> str:
         """
         Helper: return the bucket name displayed in the dashboard.
@@ -158,7 +216,7 @@ class DashboardPage(BasePage):
                     return False
 
                 return driver.find_element(*self.FLASH_MESSAGE).text.strip() == expected_text
-            except StaleElementReferenceException:
+            except (StaleElementReferenceException, WebDriverException):
                 return False
 
         try:
@@ -198,6 +256,12 @@ class DashboardPage(BasePage):
         """
         viewer_panels = self.driver.find_elements(*self.VIEWER_ROLE_PANEL)
         return bool(viewer_panels) and viewer_panels[0].is_displayed()
+
+    def get_viewer_role_status_text(self) -> str:
+        """
+        Helper: return the viewer-role status pill text.
+        """
+        return self.driver.find_element(*self.VIEWER_ROLE_STATUS).text.strip()
 
     def has_files_table(self) -> bool:
         """
@@ -288,6 +352,49 @@ class DashboardPage(BasePage):
             "uploaded_at": row.find_element(*self.FILE_UPLOADED_AT).text.strip(),
             "size": row.find_element(*self.FILE_SIZE).text.strip(),
         }
+
+    def is_download_action_visible_for_file(self, filename: str) -> bool:
+        """
+        Helper: return whether the download action is visible for one file row.
+        """
+        row = self._find_file_row_by_name(filename)
+        buttons = row.find_elements(*self.DOWNLOAD_FILE_BUTTON)
+        return bool(buttons) and buttons[0].is_displayed()
+
+    def is_download_action_clickable_for_file(self, filename: str) -> bool:
+        """
+        Helper: return whether the download action is visibly available with a real href.
+        """
+        return self.is_download_action_visible_for_file(filename) and bool(
+            self.get_download_action_href_for_file(filename)
+        )
+
+    def is_delete_action_visible_for_file(self, filename: str) -> bool:
+        """
+        Helper: return whether the delete action is visible for one file row.
+        """
+        row = self._find_file_row_by_name(filename)
+        buttons = row.find_elements(*self.DELETE_FILE_BUTTON)
+        return bool(buttons) and buttons[0].is_displayed()
+
+    def is_delete_action_clickable_for_file(self, filename: str) -> bool:
+        """
+        Helper: return whether the delete action is visible and enabled.
+        """
+        row = self._find_file_row_by_name(filename)
+        buttons = row.find_elements(*self.DELETE_FILE_BUTTON)
+        return bool(buttons) and buttons[0].is_displayed() and buttons[0].is_enabled()
+
+    def get_download_action_href_for_file(self, filename: str) -> str:
+        """
+        Helper: return the download action href for one file row.
+        """
+        row = self._find_file_row_by_name(filename)
+        return (
+            row.find_element(*self.DOWNLOAD_FILE_BUTTON)
+            .get_attribute("href")
+            .strip()
+        )
 
     def is_empty_state_visible(self) -> bool:
         """
