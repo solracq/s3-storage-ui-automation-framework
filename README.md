@@ -447,3 +447,9 @@ s3-storage-ui-automation-framework/
         ├── test_curated_smoke_scenarios.py
         └── test_positive_file_workflows_smoke.py
 ```
+
+## AI Assistance Disclosure
+
+This project was designed and implemented by the maintainer as a personal SDET portfolio project. OpenAI Codex 5.4 and Cursor/VS Code were used as development assistants for selective scaffolding, code suggestions, refactoring ideas, code review support, troubleshooting, and documentation drafting.
+
+All AI-assisted output was reviewed, adapted, tested, and validated by the maintainer before commit or merge. The test strategy, framework design, implementation decisions, and final quality accountability remained with the project maintainer.
