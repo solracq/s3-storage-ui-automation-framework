@@ -22,12 +22,13 @@ Implemented now:
 * `/health` endpoint for basic runtime diagnostics
 * Graceful degraded startup when MinIO is unavailable
 * Initial Selenium Page Object Model structure
-* Initial smoke test coverage with `pytest` and Selenium WebDriver
+* Smoke, regression, negative, edge, and authentication test coverage with `pytest` and Selenium WebDriver
+* Host-based Jenkins pipeline support for running UI tests against the Docker Compose stack
 
 Not implemented yet:
 
-* Broader regression and negative automated test suites
-* CI execution for UI automation
+* Fully containerized UI test execution for Selenium
+* Jenkins browser matrix or cross-browser CI execution
 
 ## Planned Roadmap
 
@@ -118,6 +119,133 @@ Run all smoke tests
 **Note:**
 Using `.venv/bin/python -m pytest` avoids issues where a globally installed `pytest` points to a different Python interpreter than the local project virtual environment.
 
+## Jenkins CI Approach
+
+The current CI implementation follows `Option A`:
+
+* `app` and `minio` run through `docker compose`
+* Selenium tests run from the Jenkins agent host using a Python virtual environment
+* Chrome or Chromium must be installed on the Jenkins agent
+
+This keeps the first Jenkins integration simple and reliable while preserving the existing local workflow. The current pipeline definition lives in [Jenkinsfile](/Users/carlosquiroz/dev/s3-storage-ui-automation-framework/Jenkinsfile:1).
+
+### Jenkins Agent Prerequisites
+
+The Jenkins agent should have:
+
+* `python3`
+* `docker`
+* `docker compose`
+* `google-chrome`, `google-chrome-stable`, `chromium-browser`, or `chromium`
+
+### Start Jenkins Locally
+
+If you are running Jenkins locally on macOS through Homebrew, start the service with:
+
+```bash
+brew services start jenkins-lts
+```
+
+If you installed the non-LTS formula instead, use:
+
+```bash
+brew services start jenkins
+```
+
+If you prefer to run Jenkins from a local WAR file with a custom `JENKINS_HOME`, use:
+
+```bash
+export JENKINS_HOME="$HOME/jenkins-local/home"
+nohup java -jar "$HOME/jenkins-local/war/jenkins.war" --httpPort=8080 \
+  > "$HOME/jenkins-local/logs/jenkins.out" 2>&1 &
+echo $! > "$HOME/jenkins-local/jenkins.pid"
+```
+
+Useful checks:
+
+```bash
+brew services list | rg jenkins
+```
+
+Jenkins is typically available at:
+
+* `http://localhost:8080`
+
+### Jenkins Test Suite Choices
+
+The pipeline supports these `TEST_SUITE` parameter values:
+
+* `smoke`
+* `usability`
+* `negative`
+* `edge`
+* `authentication`
+* `all-regression`
+* `all-ui`
+
+### Local CI-Like Run
+
+If you want to run the same host-based flow locally before wiring Jenkins, use:
+
+```bash
+docker compose up -d --build
+python3 -m venv .venv-jenkins
+.venv-jenkins/bin/python -m pip install --upgrade pip
+.venv-jenkins/bin/python -m pip install -r requirements-test.txt
+.venv-jenkins/bin/python scripts/wait_for_portal_health.py --base-url http://localhost:8000 --timeout-seconds 90 --require-storage-ready
+.venv-jenkins/bin/python scripts/reset_environment.py
+.venv-jenkins/bin/python -m pytest tests/smoke -m smoke -vv -s
+docker compose down -v
+```
+
+### Local Jenkins-Style Suite Commands
+
+Smoke:
+
+```bash
+.venv-jenkins/bin/python -m pytest tests/smoke -m smoke -vv -s
+```
+
+Usability:
+
+```bash
+.venv-jenkins/bin/python -m pytest tests/regression/test_usability_regression.py -m usability -vv -s
+```
+
+Negative:
+
+```bash
+.venv-jenkins/bin/python -m pytest tests/regression/test_negative_regression.py -m negative -vv -s
+```
+
+Edge:
+
+```bash
+.venv-jenkins/bin/python -m pytest tests/regression/test_edge_regression.py -m edge -vv -s
+```
+
+Authentication:
+
+```bash
+.venv-jenkins/bin/python -m pytest -m authentication -vv -s
+```
+
+All regression coverage:
+
+```bash
+.venv-jenkins/bin/python -m pytest tests/regression -m regression -vv -s
+```
+
+All current UI automation:
+
+```bash
+.venv-jenkins/bin/python -m pytest tests -m "smoke or regression" -vv -s
+```
+
+### Current CI Decision
+
+For now, the project intentionally keeps `pytest` on the Jenkins host instead of in a dedicated test container. This keeps scenario `20` and other Docker-aware tests straightforward, because those tests can control `docker compose` directly from the agent. Full test-container execution can be added later as the next CI maturity step.
+
 ## Utility Scripts
 
 Seed the demo users and reset the audit log:
@@ -131,6 +259,24 @@ Reset stored objects, reseed users, and clear the audit log:
 ```bash
 ./.venv/bin/python scripts/reset_environment.py
 ```
+
+Wait for the portal health endpoint to become ready:
+
+```bash
+python3 scripts/wait_for_portal_health.py --base-url http://localhost:8000 --timeout-seconds 90 --require-storage-ready
+```
+
+Expected Output:
+
+```bash
+{
+  "bucket": "secure-file-portal",
+  "status": "ok",
+  "storage_error": null,
+  "storage_ready": true
+}
+```
+
 
 ## Endpoints
 
