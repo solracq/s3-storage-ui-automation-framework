@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import time
 from collections.abc import Generator
@@ -34,6 +35,36 @@ def _parse_bool_env(raw_value: str | None, *, default: bool) -> bool:
         return False
 
     return default
+
+
+def _resolve_chrome_binary() -> str | None:
+    """
+    Resolve the Chrome/Chromium binary path for local and Jenkins-driven runs.
+    """
+    candidate_values = [
+        os.getenv("PORTAL_CHROME_BINARY"),
+        os.getenv("CHROME_BIN"),
+        "google-chrome",
+        "google-chrome-stable",
+        "chromium-browser",
+        "chromium",
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    ]
+
+    for candidate in candidate_values:
+        if not candidate:
+            continue
+
+        resolved_command = shutil.which(candidate)
+        if resolved_command:
+            return resolved_command
+
+        candidate_path = Path(candidate)
+        if candidate_path.is_file():
+            return str(candidate_path)
+
+    return None
 
 
 class MinioServiceController:
@@ -226,6 +257,10 @@ def driver(
         )
 
     options = webdriver.ChromeOptions()
+    chrome_binary = _resolve_chrome_binary()
+    if chrome_binary:
+        options.binary_location = chrome_binary
+
     options.add_experimental_option(
         "prefs",
         {
