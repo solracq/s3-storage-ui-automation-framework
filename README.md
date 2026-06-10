@@ -110,6 +110,9 @@ Run all smoke tests
 
 # Edge test suite
 .venv/bin/python -m pytest tests/regression/test_edge_regression.py -m edge -vv -s
+
+# Authentication test suite
+.venv/bin/python -m pytest -m authentication -vv -s
 ```
 
 **Note:**
