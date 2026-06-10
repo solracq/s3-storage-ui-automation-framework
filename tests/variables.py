@@ -14,7 +14,9 @@ VIEWER_PASSWORD = "viewer123"
 VIEWER_ROLE = "viewer"
 
 STORAGE_STATUS_CONNECTED = "Connected"
+STORAGE_STATUS_UNAVAILABLE = "Unavailable"
 HEALTH_STATUS_OK = "ok"
+HEALTH_STATUS_DEGRADED = "degraded"
 PORTAL_BUCKET_NAME = "secure-file-portal"
 PORTAL_STORAGE_ENDPOINT = "minio:9000"
 PORTAL_MODE_TEXT = "Phase 2 access-control build"
@@ -31,6 +33,10 @@ VIEWER_ROLE_STATUS_TEXT = "Download-Only Access"
 INVALID_LOGIN_MESSAGE = "Invalid username or password."
 EMPTY_UPLOAD_MESSAGE = "Please choose a file before uploading."
 EMPTY_FILE_UPLOAD_MESSAGE = "Please upload a non-empty file."
+NON_ASCII_UPLOAD_MESSAGE = (
+    "unsupported metadata value は.txt; only US-ASCII encoded characters are "
+    "supported"
+)
 OVERSIZE_UPLOAD_MESSAGE = (
     "Maximum upload size exceeded. This portal currently supports files up to 1 MB."
 )
@@ -45,6 +51,12 @@ SMALL_TEXT_FILE_PATH = TEST_DATA_DIR / SMALL_TEXT_FILE_NAME
 
 PNG_FILE_NAME = "colors.png"
 PNG_FILE_PATH = TEST_DATA_DIR / PNG_FILE_NAME
+
+EMPTY_FILE_NAME = "empty.txt"
+EMPTY_FILE_PATH = TEST_DATA_DIR / EMPTY_FILE_NAME
+
+NON_ASCII_FILE_NAME = "は.txt"
+NON_ASCII_FILE_PATH = TEST_DATA_DIR / NON_ASCII_FILE_NAME
 
 LARGE_FILE_WITHIN_LIMIT_NAME = "large-file.txt"
 LARGE_FILE_WITHIN_LIMIT_PATH = TEST_DATA_DIR / LARGE_FILE_WITHIN_LIMIT_NAME
