@@ -54,6 +54,33 @@ pipeline {
 
         stage('Verify Agent Tooling') {
             steps {
+                script {
+                    env.PORTAL_CHROME_BINARY = sh(
+                        script: '''
+                            #!/bin/bash
+                            set -euo pipefail
+
+                            if command -v google-chrome >/dev/null 2>&1; then
+                              command -v google-chrome
+                            elif command -v google-chrome-stable >/dev/null 2>&1; then
+                              command -v google-chrome-stable
+                            elif command -v chromium-browser >/dev/null 2>&1; then
+                              command -v chromium-browser
+                            elif command -v chromium >/dev/null 2>&1; then
+                              command -v chromium
+                            elif [ -x "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]; then
+                              echo "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+                            elif [ -x "/Applications/Chromium.app/Contents/MacOS/Chromium" ]; then
+                              echo "/Applications/Chromium.app/Contents/MacOS/Chromium"
+                            else
+                              echo "Chrome or Chromium must be installed on the Jenkins agent." >&2
+                              exit 1
+                            fi
+                        ''',
+                        returnStdout: true,
+                    ).trim()
+                }
+
                 sh '''
                     #!/bin/bash
                     set -euo pipefail
@@ -61,19 +88,8 @@ pipeline {
                     python3 --version
                     docker --version
                     docker compose version
-
-                    if command -v google-chrome >/dev/null 2>&1; then
-                      google-chrome --version
-                    elif command -v google-chrome-stable >/dev/null 2>&1; then
-                      google-chrome-stable --version
-                    elif command -v chromium-browser >/dev/null 2>&1; then
-                      chromium-browser --version
-                    elif command -v chromium >/dev/null 2>&1; then
-                      chromium --version
-                    else
-                      echo "Chrome or Chromium must be installed on the Jenkins agent."
-                      exit 1
-                    fi
+                    echo "Using browser binary: ${PORTAL_CHROME_BINARY}"
+                    "${PORTAL_CHROME_BINARY}" --version
                 '''
             }
         }
