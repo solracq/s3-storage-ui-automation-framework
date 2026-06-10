@@ -100,6 +100,11 @@ Run all smoke tests
 .venv/bin/python -m pytest tests/smoke -m smoke -vv -s
 ```
 
+## Local Regression Test Run
+```bash
+.venv/bin/python -m pytest tests/regression/test_usability_regression.py -m usability -vv -s
+```
+
 **Note:**
 Using `.venv/bin/python -m pytest` avoids issues where a globally installed `pytest` points to a different Python interpreter than the local project virtual environment.
 
