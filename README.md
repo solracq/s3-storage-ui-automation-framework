@@ -107,6 +107,9 @@ Run all smoke tests
 
 # Negative test suite
 .venv/bin/python -m pytest tests/regression/test_negative_regression.py -m negative -vv -s
+
+# Edge test suite
+.venv/bin/python -m pytest tests/regression/test_edge_regression.py -m edge -vv -s
 ```
 
 **Note:**
