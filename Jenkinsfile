@@ -25,6 +25,16 @@ pipeline {
             defaultValue: false,
             description: 'Keep the Docker Compose stack running after the build for troubleshooting.',
         )
+        booleanParam(
+            name: 'SEND_FAILURE_EMAIL',
+            defaultValue: false,
+            description: 'Send email notifications for unstable or failed runs.',
+        )
+        string(
+            name: 'EMAIL_RECIPIENTS',
+            defaultValue: '',
+            description: 'Comma-separated email recipients for unstable or failed build notifications.',
+        )
     }
 
     environment {
@@ -115,45 +125,108 @@ pipeline {
             }
         }
 
-        stage('Run UI Tests') {
+        stage('Run Smoke Tests') {
+            when {
+                expression {
+                    params.TEST_SUITE in ['smoke', 'all-ui']
+                }
+            }
             steps {
                 sh '''
                     #!/bin/bash
                     set -euo pipefail
-
                     mkdir -p "${PYTEST_REPORT_DIR}"
-
-                    case "${TEST_SUITE}" in
-                      smoke)
-                        set -- tests/smoke -m smoke
-                        ;;
-                      usability)
-                        set -- tests/regression/test_usability_regression.py -m usability
-                        ;;
-                      negative)
-                        set -- tests/regression/test_negative_regression.py -m negative
-                        ;;
-                      edge)
-                        set -- tests/regression/test_edge_regression.py -m edge
-                        ;;
-                      authentication)
-                        set -- -m authentication
-                        ;;
-                      all-regression)
-                        set -- tests/regression -m regression
-                        ;;
-                      all-ui)
-                        set -- tests -m "smoke or regression"
-                        ;;
-                      *)
-                        echo "Unsupported TEST_SUITE: ${TEST_SUITE}"
-                        exit 1
-                        ;;
-                    esac
-
-                    "${PYTEST_VENV}/bin/python" -m pytest "$@" -vv -s \
-                      --junitxml="${PYTEST_REPORT_DIR}/pytest-${TEST_SUITE}.xml"
+                    "${PYTEST_VENV}/bin/python" -m pytest tests/smoke -m smoke -vv -s \
+                      --junitxml="${PYTEST_REPORT_DIR}/pytest-smoke.xml"
                 '''
+            }
+        }
+
+        stage('Run Usability Regression Tests') {
+            when {
+                expression {
+                    params.TEST_SUITE in ['usability', 'all-regression', 'all-ui']
+                }
+            }
+            steps {
+                sh '''
+                    #!/bin/bash
+                    set -euo pipefail
+                    mkdir -p "${PYTEST_REPORT_DIR}"
+                    "${PYTEST_VENV}/bin/python" -m pytest \
+                      tests/regression/test_usability_regression.py -m usability -vv -s \
+                      --junitxml="${PYTEST_REPORT_DIR}/pytest-usability.xml"
+                '''
+            }
+        }
+
+        stage('Run Negative Regression Tests') {
+            when {
+                expression {
+                    params.TEST_SUITE in ['negative', 'all-regression', 'all-ui']
+                }
+            }
+            steps {
+                sh '''
+                    #!/bin/bash
+                    set -euo pipefail
+                    mkdir -p "${PYTEST_REPORT_DIR}"
+                    "${PYTEST_VENV}/bin/python" -m pytest \
+                      tests/regression/test_negative_regression.py -m negative -vv -s \
+                      --junitxml="${PYTEST_REPORT_DIR}/pytest-negative.xml"
+                '''
+            }
+        }
+
+        stage('Run Edge Regression Tests') {
+            when {
+                expression {
+                    params.TEST_SUITE in ['edge', 'all-regression', 'all-ui']
+                }
+            }
+            steps {
+                sh '''
+                    #!/bin/bash
+                    set -euo pipefail
+                    mkdir -p "${PYTEST_REPORT_DIR}"
+                    "${PYTEST_VENV}/bin/python" -m pytest \
+                      tests/regression/test_edge_regression.py -m edge -vv -s \
+                      --junitxml="${PYTEST_REPORT_DIR}/pytest-edge.xml"
+                '''
+            }
+        }
+
+        stage('Run Authentication Tests') {
+            when {
+                expression {
+                    params.TEST_SUITE in ['authentication', 'all-regression', 'all-ui']
+                }
+            }
+            steps {
+                script {
+                    if (params.TEST_SUITE == 'authentication') {
+                        sh '''
+                            #!/bin/bash
+                            set -euo pipefail
+                            mkdir -p "${PYTEST_REPORT_DIR}"
+                            "${PYTEST_VENV}/bin/python" -m pytest \
+                              tests/smoke/test_curated_smoke_scenarios.py \
+                              tests/regression/test_authentication_regression.py \
+                              -m authentication -vv -s \
+                              --junitxml="${PYTEST_REPORT_DIR}/pytest-authentication.xml"
+                        '''
+                    } else {
+                        sh '''
+                            #!/bin/bash
+                            set -euo pipefail
+                            mkdir -p "${PYTEST_REPORT_DIR}"
+                            "${PYTEST_VENV}/bin/python" -m pytest \
+                              tests/regression/test_authentication_regression.py \
+                              -m authentication -vv -s \
+                              --junitxml="${PYTEST_REPORT_DIR}/pytest-authentication.xml"
+                        '''
+                    }
+                }
             }
         }
     }
@@ -166,11 +239,66 @@ pipeline {
                 mkdir -p "${PYTEST_REPORT_DIR}"
                 docker compose ps > "${PYTEST_REPORT_DIR}/docker-compose-ps.txt"
                 docker compose logs --no-color > "${PYTEST_REPORT_DIR}/docker-compose.log"
+                find "${PYTEST_REPORT_DIR}" -type f | LC_ALL=C sort > "${PYTEST_REPORT_DIR}/artifact-manifest.txt"
             '''
 
-            junit allowEmptyResults: true, testResults: 'reports/*.xml'
-            archiveArtifacts artifacts: 'reports/**', allowEmptyArchive: true
+            junit allowEmptyResults: true, keepLongStdio: true, testResults: 'reports/*.xml'
+            archiveArtifacts artifacts: 'reports/**', allowEmptyArchive: true, fingerprint: true
+        }
 
+        success {
+            echo 'UI test stages completed successfully. JUnit reports and archived artifacts are available on this build.'
+        }
+
+        unstable {
+            script {
+                if (params.SEND_FAILURE_EMAIL && params.EMAIL_RECIPIENTS?.trim()) {
+                    mail(
+                        to: params.EMAIL_RECIPIENTS.trim(),
+                        subject: "[${env.JOB_NAME}] UNSTABLE: Build #${env.BUILD_NUMBER}",
+                        body: """Jenkins build notification
+
+Job: ${env.JOB_NAME}
+Build Number: #${env.BUILD_NUMBER}
+Status: UNSTABLE
+Build URL: ${env.BUILD_URL}
+Test Report: ${env.BUILD_URL}testReport/
+Artifacts: ${env.BUILD_URL}artifact/
+
+One or more test stages completed with unstable results. Please review Stage View, test reports, and archived artifacts.
+""",
+                    )
+                }
+            }
+        }
+
+        failure {
+            script {
+                if (params.SEND_FAILURE_EMAIL && params.EMAIL_RECIPIENTS?.trim()) {
+                    mail(
+                        to: params.EMAIL_RECIPIENTS.trim(),
+                        subject: "[${env.JOB_NAME}] FAILED: Build #${env.BUILD_NUMBER}",
+                        body: """Jenkins build notification
+
+Job: ${env.JOB_NAME}
+Build Number: #${env.BUILD_NUMBER}
+Status: FAILED
+Build URL: ${env.BUILD_URL}
+Test Report: ${env.BUILD_URL}testReport/
+Artifacts: ${env.BUILD_URL}artifact/
+
+One or more stages failed. Please review Stage View, console logs, test reports, and archived artifacts.
+""",
+                    )
+                }
+            }
+        }
+
+        unsuccessful {
+            echo 'One or more UI test stages failed. Review Stage View, test reports, and archived artifacts for details.'
+        }
+
+        cleanup {
             script {
                 if (!params.KEEP_STACK_UP) {
                     sh '''
