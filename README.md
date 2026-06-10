@@ -126,6 +126,8 @@ The current CI implementation follows:
 * `app` and `minio` run through `docker compose`
 * Selenium tests run from the Jenkins agent host using a Python virtual environment
 * Chrome or Chromium must be installed on the Jenkins agent
+* current CI approach: host-based Selenium execution against a Dockerized app stack
+* future improvement: fully containerized browser/test execution for higher portability
 
 This keeps the first Jenkins integration simple and reliable while preserving the existing local workflow. The current pipeline definition lives in [Jenkinsfile](.../s3-storage-ui-automation-framework/Jenkinsfile:1).
 
