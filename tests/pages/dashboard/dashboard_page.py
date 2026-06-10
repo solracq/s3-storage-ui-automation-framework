@@ -46,6 +46,10 @@ class DashboardPage(BasePage):
         "[data-testid='storage-status-panel']",
     )
     STORAGE_STATUS: Locator = (By.CSS_SELECTOR, "[data-testid='storage-status']")
+    STORAGE_ERROR_MESSAGE: Locator = (
+        By.CSS_SELECTOR,
+        "[data-testid='storage-error-message']",
+    )
     BUCKET_NAME: Locator = (By.CSS_SELECTOR, "[data-testid='bucket-name']")
     STORAGE_ENDPOINT: Locator = (By.CSS_SELECTOR, "[data-testid='storage-endpoint']")
     PORTAL_MODE: Locator = (By.CSS_SELECTOR, "[data-testid='portal-mode']")
@@ -118,6 +122,34 @@ class DashboardPage(BasePage):
         """
         return self.driver.find_element(*self.STORAGE_STATUS).text.strip()
 
+    def wait_for_storage_status_text(
+        self,
+        expected_text: str,
+        timeout_seconds: int = 10,
+    ) -> str:
+        """
+        Helper: wait until the storage status text matches the expected value.
+        """
+        def _storage_status_matches(driver) -> bool:
+            try:
+                statuses = driver.find_elements(*self.STORAGE_STATUS)
+                if not statuses:
+                    return False
+
+                return driver.find_element(*self.STORAGE_STATUS).text.strip() == expected_text
+            except (StaleElementReferenceException, WebDriverException):
+                return False
+
+        try:
+            WebDriverWait(self.driver, timeout_seconds).until(_storage_status_matches)
+        except TimeoutException as exc:
+            raise AssertionError(
+                f"Expected storage status to become '{expected_text}' within "
+                f"{timeout_seconds} seconds."
+            ) from exc
+
+        return self.get_storage_status_text()
+
     def get_page_heading_text(self) -> str:
         """
         Helper: return the dashboard page heading text.
@@ -177,6 +209,19 @@ class DashboardPage(BasePage):
         """
         return self.driver.find_element(*self.BUCKET_NAME).text.strip()
 
+    def is_storage_error_message_visible(self) -> bool:
+        """
+        Helper: return whether a storage error message is currently visible.
+        """
+        messages = self.driver.find_elements(*self.STORAGE_ERROR_MESSAGE)
+        return bool(messages) and messages[0].is_displayed()
+
+    def get_storage_error_message_text(self) -> str:
+        """
+        Helper: return the visible storage error message text.
+        """
+        return self.driver.find_element(*self.STORAGE_ERROR_MESSAGE).text.strip()
+
     def get_storage_endpoint_text(self) -> str:
         """
         Helper: return the storage endpoint displayed in the dashboard.
@@ -200,6 +245,32 @@ class DashboardPage(BasePage):
         Helper: return the visible dashboard flash message text.
         """
         return self.driver.find_element(*self.FLASH_MESSAGE).text.strip()
+
+    def wait_for_any_flash_message_text(self, timeout_seconds: int = 10) -> str:
+        """
+        Helper: wait until any dashboard flash message is visible and non-empty.
+        """
+        def _dashboard_flash_message_exists(driver) -> bool:
+            try:
+                flash_messages = driver.find_elements(*self.FLASH_MESSAGE)
+                if not flash_messages:
+                    return False
+
+                return driver.find_element(*self.FLASH_MESSAGE).text.strip() != ""
+            except (StaleElementReferenceException, WebDriverException):
+                return False
+
+        try:
+            WebDriverWait(self.driver, timeout_seconds).until(
+                _dashboard_flash_message_exists
+            )
+        except TimeoutException as exc:
+            raise AssertionError(
+                "Expected a dashboard flash message to appear within "
+                f"{timeout_seconds} seconds."
+            ) from exc
+
+        return self.get_flash_message_text()
 
     def wait_for_flash_message_text(
         self,
