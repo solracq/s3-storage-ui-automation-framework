@@ -148,6 +148,10 @@ The Jenkins agent should have:
 * `docker compose`
 * `google-chrome`, `google-chrome-stable`, `chromium-browser`, or `chromium`
 
+On macOS, the pipeline also supports the standard application path:
+
+* `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
+
 ### Start Jenkins Locally
 
 If you are running Jenkins locally on macOS through Homebrew, start the service with:
