@@ -83,6 +83,60 @@ class LoginPage(BasePage):
         """
         self.driver.find_element(*self.LOGIN_NAV_LINK).click()
 
+    def paste_credentials(self, username: str, password: str) -> None:
+        """
+        Populate the login fields through a paste-style browser event path.
+
+        Args:
+            username {str}: user's username
+            password {str}: user's password
+        """
+        username_input = self.driver.find_element(*self.USERNAME_INPUT)
+        password_input = self.driver.find_element(*self.PASSWORD_INPUT)
+
+        self.driver.execute_script(
+            """
+            const [usernameInput, passwordInput, usernameValue, passwordValue] = arguments;
+
+            for (const [element, value] of [
+                [usernameInput, usernameValue],
+                [passwordInput, passwordValue],
+            ]) {
+                element.focus();
+                element.value = "";
+
+                const clipboardData = new DataTransfer();
+                clipboardData.setData("text/plain", value);
+
+                element.dispatchEvent(
+                    new ClipboardEvent("paste", {
+                        clipboardData,
+                        bubbles: true,
+                        cancelable: true,
+                    }),
+                );
+
+                element.value = value;
+                element.dispatchEvent(new Event("input", { bubbles: true }));
+                element.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            """,
+            username_input,
+            password_input,
+            username,
+            password,
+        )
+
+    def submit_login_expected_success(self) -> DashboardPage:
+        """
+        Submit the login form and return the dashboard page object.
+
+        Returns:
+            DashboardPage: dashboard page object after a successful login submission.
+        """
+        self.submit_login()
+        return DashboardPage(self.driver)
+
     def submit_login(self) -> None:
         """
         Click the sign-in button without filling the login fields first.
@@ -103,6 +157,24 @@ class LoginPage(BasePage):
         Helper: return the visible login flash message text.
         """
         return self.driver.find_element(*self.FLASH_MESSAGE).text.strip()
+
+    def get_username_value(self) -> str:
+        """
+        Helper: return the current username field value.
+        """
+        return self.driver.find_element(*self.USERNAME_INPUT).get_attribute("value").strip()
+
+    def get_password_value(self) -> str:
+        """
+        Helper: return the current password field value.
+        """
+        return self.driver.find_element(*self.PASSWORD_INPUT).get_attribute("value").strip()
+
+    def has_prefilled_credentials(self) -> bool:
+        """
+        Helper: return whether the login fields already contain credential values.
+        """
+        return bool(self.get_username_value()) and bool(self.get_password_value())
 
     def wait_for_flash_message_text(self, expected_text: str, timeout_seconds: int = 10) -> str:
         """

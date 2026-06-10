@@ -31,6 +31,8 @@ EMPTY_FILES_MESSAGE = (
 )
 VIEWER_ROLE_STATUS_TEXT = "Download-Only Access"
 INVALID_LOGIN_MESSAGE = "Invalid username or password."
+PLEASE_SIGN_IN_MESSAGE = "Please sign in to access the portal."
+LOGGED_OUT_SUCCESS_MESSAGE = "Logged out successfully."
 EMPTY_UPLOAD_MESSAGE = "Please choose a file before uploading."
 EMPTY_FILE_UPLOAD_MESSAGE = "Please upload a non-empty file."
 NON_ASCII_UPLOAD_MESSAGE = (
