@@ -121,13 +121,23 @@ Using `.venv/bin/python -m pytest` avoids issues where a globally installed `pyt
 
 ## Jenkins CI Approach
 
-The current CI implementation follows `Option A`:
+The current CI implementation follows:
 
 * `app` and `minio` run through `docker compose`
 * Selenium tests run from the Jenkins agent host using a Python virtual environment
 * Chrome or Chromium must be installed on the Jenkins agent
 
-This keeps the first Jenkins integration simple and reliable while preserving the existing local workflow. The current pipeline definition lives in [Jenkinsfile](/Users/carlosquiroz/dev/s3-storage-ui-automation-framework/Jenkinsfile:1).
+This keeps the first Jenkins integration simple and reliable while preserving the existing local workflow. The current pipeline definition lives in [Jenkinsfile](.../s3-storage-ui-automation-framework/Jenkinsfile:1).
+
+In Jenkins Stage View, the pipeline now exposes separate test stages for:
+
+* `Smoke Tests`
+* `Usability Regression Tests`
+* `Negative Regression Tests`
+* `Edge Regression Tests`
+* `Authentication Tests`
+
+This makes it easier to see which suite area passed, failed, or was skipped during a given run.
 
 ### Jenkins Agent Prerequisites
 
@@ -182,6 +192,35 @@ The pipeline supports these `TEST_SUITE` parameter values:
 * `authentication`
 * `all-regression`
 * `all-ui`
+
+### Jenkins Reports And Artifacts
+
+The pipeline publishes JUnit XML test reports and archives the `reports/` directory on every run.
+
+This gives you:
+
+* Jenkins `Test Result` details for each build
+* the Jenkins `Test Result Trend` graph across builds
+* archived artifacts such as:
+  * `pytest-*.xml`
+  * `docker-compose.log`
+  * `docker-compose-ps.txt`
+  * `artifact-manifest.txt`
+
+The archived artifacts appear on the Jenkins build page, and the trend graph is driven by the `junit` publication step in the pipeline.
+
+### Jenkins Failure Email Notifications
+
+If `SEND_FAILURE_EMAIL=true` and `EMAIL_RECIPIENTS` is filled in, Jenkins will send an email that includes:
+
+* job name
+* build number
+* build URL
+* test report URL
+* artifacts URL
+
+**Note:**
+Jenkins must be configured with a working SMTP/mail setup for these notifications to be delivered.
 
 ### Local CI-Like Run
 
