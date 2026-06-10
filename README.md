@@ -355,6 +355,7 @@ docker logs secure-s3-portal-app
 ```text
 s3-storage-ui-automation-framework/
 ├── Dockerfile
+├── Jenkinsfile
 ├── README.md
 ├── app/
 │   ├── __init__.py
@@ -388,9 +389,55 @@ s3-storage-ui-automation-framework/
 │   ├── Test_Plan_s3_storage_UI.md
 │   └── Test_Strategy_s3_storage_UI.md
 ├── docker-compose.yml
+├── pytest.ini
+├── requirements-test.txt
 ├── requirements.txt
 ├── runtime/  (generated locally)
-└── scripts/
-    ├── reset_environment.py
-    └── seed_demo_users.py
+├── scripts/
+│   ├── reset_environment.py
+│   ├── seed_demo_users.py
+│   └── wait_for_portal_health.py
+└── tests/
+    ├── __init__.py
+    ├── conftest.py
+    ├── variables.py
+    ├── data/
+    │   ├── colors.png
+    │   ├── empty.txt
+    │   ├── large-file-size-exeeded.txt
+    │   ├── large-file.txt
+    │   ├── sample-audio.wav
+    │   ├── sample-data.csv
+    │   ├── sample-document.pdf
+    │   ├── sample-no-extension
+    │   ├── sample-notes.md
+    │   ├── sample-photo.jpeg
+    │   ├── sample-report.docx
+    │   ├── sdfaflaf;lfad;lkaf;lkfdajk;ljeroijfd98438943%$#YGREW%TS%#HJYJ%JJYTDD%^JJ%S%HTHS.txt
+    │   ├── small_file.txt
+    │   └── は.txt
+    ├── pages/
+    │   ├── __init__.py
+    │   ├── base_page.py
+    │   ├── audit_records/
+    │   │   ├── __init__.py
+    │   │   └── audit_log_page.py
+    │   ├── dashboard/
+    │   │   ├── __init__.py
+    │   │   └── dashboard_page.py
+    │   ├── errors/
+    │   │   ├── __init__.py
+    │   │   └── access_denied_page.py
+    │   └── login/
+    │       ├── __init__.py
+    │       └── login_page.py
+    ├── regression/
+    │   ├── test_authentication_regression.py
+    │   ├── test_edge_regression.py
+    │   ├── test_negative_regression.py
+    │   └── test_usability_regression.py
+    └── smoke/
+        ├── test_admin_login_smoke.py
+        ├── test_curated_smoke_scenarios.py
+        └── test_positive_file_workflows_smoke.py
 ```
