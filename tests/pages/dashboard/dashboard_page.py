@@ -122,11 +122,7 @@ class DashboardPage(BasePage):
         """
         return self.driver.find_element(*self.STORAGE_STATUS).text.strip()
 
-    def wait_for_storage_status_text(
-        self,
-        expected_text: str,
-        timeout_seconds: int = 10,
-    ) -> str:
+    def wait_for_storage_status_text(self, expected_text: str, timeout_seconds: int = 10) -> str:
         """
         Helper: wait until the storage status text matches the expected value.
         """
@@ -272,11 +268,7 @@ class DashboardPage(BasePage):
 
         return self.get_flash_message_text()
 
-    def wait_for_flash_message_text(
-        self,
-        expected_text: str,
-        timeout_seconds: int = 10,
-    ) -> str:
+    def wait_for_flash_message_text(self, expected_text: str, timeout_seconds: int = 10) -> str:
         """
         Helper: wait until the dashboard flash message matches the expected text.
         """
@@ -389,11 +381,7 @@ class DashboardPage(BasePage):
         )
         return self.contains_file_name(filename)
 
-    def wait_until_file_name_not_visible(
-        self,
-        filename: str,
-        timeout_seconds: int = 10,
-    ) -> bool:
+    def wait_until_file_name_not_visible(self, filename: str, timeout_seconds: int = 10) -> bool:
         """
         Helper: wait until the dashboard no longer shows the given file name.
         """
