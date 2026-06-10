@@ -4,12 +4,18 @@ Shared pytest fixtures for Secure S3 File Portal UI automation.
 
 from __future__ import annotations
 
+import json
 import os
+import subprocess
+import time
 from collections.abc import Generator
 from pathlib import Path
+from urllib.request import urlopen
 
 import pytest
 from selenium import webdriver
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 
 def _parse_bool_env(raw_value: str | None, *, default: bool) -> bool:
@@ -28,6 +34,108 @@ def _parse_bool_env(raw_value: str | None, *, default: bool) -> bool:
         return False
 
     return default
+
+
+class MinioServiceController:
+    """
+    Stop and restore the local MinIO Compose service for outage-based UI tests.
+    """
+
+    def __init__(self, project_root: Path, base_url: str) -> None:
+        self._project_root = project_root
+        self._base_url = base_url
+        self._service_stopped = False
+
+    def stop(self) -> dict[str, object]:
+        """
+        Stop the MinIO service and wait until the portal health endpoint degrades.
+        """
+        self._run_compose_command("stop", "minio")
+        self._service_stopped = True
+        return self.wait_for_storage_ready(expected=False, timeout_seconds=60)
+
+    def start(self) -> dict[str, object]:
+        """
+        Start the MinIO service and wait until the portal health endpoint recovers.
+        """
+        self._run_compose_command("start", "minio")
+        payload = self.wait_for_storage_ready(expected=True, timeout_seconds=60)
+        self._service_stopped = False
+        return payload
+
+    def ensure_started(self) -> None:
+        """
+        Restore MinIO if the current test stopped it.
+        """
+        if self._service_stopped:
+            self.start()
+
+    def read_health_payload(self) -> dict[str, object]:
+        """
+        Read and decode the current `/health` payload from the running portal.
+        """
+        with urlopen(f"{self._base_url}/health", timeout=15) as response:
+            return json.loads(response.read().decode("utf-8"))
+
+    def wait_for_storage_ready(
+        self,
+        *,
+        expected: bool,
+        timeout_seconds: int = 30,
+    ) -> dict[str, object]:
+        """
+        Poll the portal health endpoint until storage readiness reaches the expected state.
+        """
+        deadline = time.monotonic() + timeout_seconds
+        last_payload: dict[str, object] | None = None
+        last_error: Exception | None = None
+
+        while time.monotonic() < deadline:
+            try:
+                payload = self.read_health_payload()
+                last_payload = payload
+                if payload.get("storage_ready") is expected:
+                    return payload
+            except Exception as exc:
+                last_error = exc
+
+            time.sleep(1)
+
+        expected_state = "ready" if expected else "unavailable"
+        extra_context = (
+            f" Last health payload: {last_payload!r}."
+            if last_payload is not None
+            else f" Last error: {last_error!r}."
+        )
+        raise AssertionError(
+            f"Timed out waiting for MinIO storage to become {expected_state}."
+            f"{extra_context}"
+        )
+
+    def _run_compose_command(self, *args: str) -> None:
+        """
+        Run one Docker Compose command against the local project.
+        """
+        try:
+            subprocess.run(
+                ["docker", "compose", *args],
+                cwd=self._project_root,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except FileNotFoundError as exc:
+            raise AssertionError(
+                "Docker is required for the MinIO outage tests, but the `docker` "
+                "command was not found."
+            ) from exc
+        except subprocess.CalledProcessError as exc:
+            stderr = (exc.stderr or "").strip()
+            stdout = (exc.stdout or "").strip()
+            details = stderr or stdout or str(exc)
+            raise AssertionError(
+                f"Docker Compose command `docker compose {' '.join(args)}` failed: {details}"
+            ) from exc
 
 
 @pytest.fixture(scope="session")
@@ -92,6 +200,16 @@ def storage_service():
     from app.storage_portal.settings import get_settings
 
     return StorageService(get_settings())
+
+
+@pytest.fixture
+def minio_service_controller(base_url: str) -> Generator[MinioServiceController, None, None]:
+    """
+    Provide a helper that can stop and restore MinIO around outage-oriented UI tests.
+    """
+    controller = MinioServiceController(PROJECT_ROOT, base_url)
+    yield controller
+    controller.ensure_started()
 
 
 @pytest.fixture
