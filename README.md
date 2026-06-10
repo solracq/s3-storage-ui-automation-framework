@@ -102,7 +102,11 @@ Run all smoke tests
 
 ## Local Regression Test Run
 ```bash
+# Usability test suite
 .venv/bin/python -m pytest tests/regression/test_usability_regression.py -m usability -vv -s
+
+# Negative test suite
+.venv/bin/python -m pytest tests/regression/test_negative_regression.py -m negative -vv -s
 ```
 
 **Note:**
