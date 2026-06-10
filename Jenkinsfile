@@ -68,6 +68,7 @@ pipeline {
             }
         }
 
+        // `docker compose up -d --build` already builds the app image before starting the stack.
         stage('Start Portal Stack') {
             steps {
                 sh '''
